@@ -111,4 +111,15 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'Utente eliminato con successo.');
     }
+
+    public function toggleStatus(User $user)
+    {
+        $this->authorize('update', $user);
+
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $status = $user->is_active ? 'attivato' : 'disattivato';
+        return redirect()->back()->with('success', "L'utente è stato {$status} con successo.");
+    }
 }

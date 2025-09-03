@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -7,19 +10,19 @@
                 <p class="text-3xl font-bold">{{ $usersCount }}</p>
                 <p class="text-sm mt-2">Attivi: {{ $activeUsersCount }}</p>
             </div>
-            
+
             <div class="bg-green-100 dark:bg-green-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">DDT Totali</h3>
                 <p class="text-3xl font-bold">0</p>
                 <p class="text-sm mt-2">In attesa: 0</p>
             </div>
-            
+
             <div class="bg-yellow-100 dark:bg-yellow-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Fornitori</h3>
                 <p class="text-3xl font-bold">0</p>
                 <p class="text-sm mt-2">Attivi: 0</p>
             </div>
-            
+
             <div class="bg-purple-100 dark:bg-purple-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Prodotti</h3>
                 <p class="text-3xl font-bold">0</p>
@@ -48,20 +51,20 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @foreach($user->getRoleNames() as $role)
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        {{ $role }}
-                                    </span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {{ $role }}
+                                </span>
                                 @endforeach
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($user->is_active)
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Attivo
-                                    </span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Attivo
+                                </span>
                                 @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Inattivo
-                                    </span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Inattivo
+                                </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -86,18 +89,11 @@
             <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div class="space-y-2">
-                    <a href="{{ route('admin.ddt.create') }}" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">
-                        Nuovo DDT
-                    </a>
+
                     <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
                         Nuovo Utente
                     </a>
-                    <a href="{{ route('admin.products.create') }}" class="block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500">
-                        Nuovo Prodotto
-                    </a>
-                    <a href="{{ route('admin.suppliers.create') }}" class="block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500">
-                        Nuovo Fornitore
-                    </a>
+
                 </div>
             </div>
 
@@ -121,3 +117,4 @@
         </div>
     </div>
 </div>
+@endsection

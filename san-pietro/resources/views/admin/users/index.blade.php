@@ -31,25 +31,37 @@
                                 <td class="py-3 px-4">{{ $user->company->name }}</td>
                                 <td class="py-3 px-4">
                                     @foreach($user->roles as $role)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            {{ $role->name }}
-                                        </span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        {{ $role->name }}
+                                    </span>
                                     @endforeach
                                 </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-3">
-                                        <a href="{{ route('admin.users.edit', $user) }}" 
-                                           class="text-indigo-600 hover:text-indigo-900">
+                                        <a href="{{ route('admin.users.edit', $user) }}"
+                                            class="text-indigo-600 hover:text-indigo-900">
                                             Modifica
                                         </a>
-                                        <form action="{{ route('admin.users.destroy', $user) }}" 
-                                              method="POST" 
-                                              class="inline-block"
-                                              onsubmit="return confirm('Sei sicuro di voler eliminare questo utente?');">
+
+                                        <form action="{{ route('admin.users.toggle-status', $user) }}"
+                                            method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="{{ $user->is_active ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900' }}">
+                                                {{ $user->is_active ? 'Disattiva' : 'Attiva' }}
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('admin.users.destroy', $user) }}"
+                                            method="POST"
+                                            class="inline-block"
+                                            onsubmit="return confirm('Sei sicuro di voler eliminare questo utente?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" 
-                                                    class="text-red-600 hover:text-red-900">
+                                            <button type="submit"
+                                                class="text-red-600 hover:text-red-900">
                                                 Elimina
                                             </button>
                                         </form>

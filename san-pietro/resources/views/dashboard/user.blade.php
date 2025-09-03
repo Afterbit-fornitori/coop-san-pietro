@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -6,12 +9,12 @@
                 <h3 class="text-lg font-semibold mb-2">DDT Creati</h3>
                 <p class="text-3xl font-bold">0</p>
             </div>
-            
+
             <div class="bg-green-100 dark:bg-green-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Prodotti Gestiti</h3>
                 <p class="text-3xl font-bold">0</p>
             </div>
-            
+
             <div class="bg-yellow-100 dark:bg-yellow-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Attività Recenti</h3>
                 <p class="text-3xl font-bold">0</p>
@@ -70,3 +73,4 @@
         </div>
     </div>
 </div>
+@endsection

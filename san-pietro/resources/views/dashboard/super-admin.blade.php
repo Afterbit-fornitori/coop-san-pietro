@@ -1,3 +1,7 @@
+@extends('layouts.app')
+
+@section('content')
+
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -7,17 +11,17 @@
                 <p class="text-3xl font-bold">{{ $totalCompanies }}</p>
                 <p class="text-sm mt-2">Attive: {{ $activeCompanies }}</p>
             </div>
-            
+
             <div class="bg-green-100 dark:bg-green-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Utenti Totali</h3>
                 <p class="text-3xl font-bold">{{ $totalUsers }}</p>
             </div>
-            
+
             <div class="bg-yellow-100 dark:bg-yellow-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Companies Recenti</h3>
                 <p class="text-3xl font-bold">{{ $latestCompanies->count() }}</p>
             </div>
-            
+
             <div class="bg-purple-100 dark:bg-purple-800 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Inviti Pendenti</h3>
                 <p class="text-3xl font-bold">{{ $pendingInvites }}</p>
@@ -44,20 +48,20 @@
                                 <a href="{{ route('admin.companies.show', $company) }}" class="hover:text-blue-600">
                                     {{ $company->name }}
                                     @if($company->parent_id)
-                                        <span class="text-sm text-gray-500">(Child di {{ $company->parentCompany->name }})</span>
+                                    <span class="text-sm text-gray-500">(Child di {{ $company->parentCompany->name }})</span>
                                     @endif
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ ucfirst($company->type) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($company->is_active)
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Attiva
-                                    </span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Attiva
+                                </span>
                                 @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Inattiva
-                                    </span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Inattiva
+                                </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -123,3 +127,4 @@
         </div>
     </div>
 </div>
+@endsection

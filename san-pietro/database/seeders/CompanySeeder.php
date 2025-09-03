@@ -12,9 +12,15 @@ class CompanySeeder extends Seeder
 {
     public function run(): void
     {
-
-        // Ottieni la company principale (San Pietro)
-        $sanPietro = Company::where('domain', 'san-pietro.test')->first();
+        // Crea o recupera la company principale (San Pietro)
+        $sanPietro = Company::firstOrCreate(
+            ['domain' => 'san-pietro.test'],
+            [
+                'name' => 'Cooperativa San Pietro',
+                'type' => 'parent',
+                'is_active' => true
+            ]
+        );
 
         // Crea il company admin per San Pietro
         $companyAdmin = User::create([
@@ -26,7 +32,7 @@ class CompanySeeder extends Seeder
         $companyAdmin->assignRole('company-admin');
 
         // Crea alcuni utenti standard per San Pietro
-        for($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; $i++) {
             $user = User::create([
                 'name' => "User $i",
                 'email' => "user$i@san-pietro.test",
