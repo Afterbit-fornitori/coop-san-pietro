@@ -39,7 +39,7 @@ class Kernel extends HttpKernel
         ],
 
         'tenant' => [
-            \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
+            \App\Http\Middleware\SwitchTenantMiddleware::class,
             \Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession::class,
         ],
 
@@ -69,7 +69,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'check.company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
+        'tenant' => \App\Http\Middleware\SwitchTenantMiddleware::class,
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

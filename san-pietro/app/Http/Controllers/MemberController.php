@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::forCurrentCompany()->get();
+        // Spatie Multi-tenancy gestisce automaticamente lo scoping
+        $members = Member::all();
         return view('members.index', compact('members'));
     }
 
@@ -33,9 +35,8 @@ class MemberController extends Controller
             'vessel_notes' => 'nullable|string'
         ]);
 
-        $member = new Member($validated);
-        $member->company_id = auth()->user()->company_id;
-        $member->save();
+        // Spatie Multi-tenancy imposterà automaticamente il company_id
+        $member = Member::create($validated);
 
         // Genera automaticamente la struttura di produzione settimanale
         // TODO: Implementare la logica per la generazione della struttura di produzione

@@ -10,7 +10,8 @@ class ProductionController extends Controller
 {
     public function index()
     {
-        $productions = Production::where('company_id', auth()->user()->company_id)->get();
+        // Spatie Multi-tenancy gestisce automaticamente lo scoping
+        $productions = Production::all();
         return view('company.productions.index', compact('productions'));
     }
 
@@ -27,7 +28,7 @@ class ProductionController extends Controller
             // altri campi necessari
         ]);
 
-        $validated['company_id'] = auth()->user()->company_id;
+        // Spatie Multi-tenancy imposterà automaticamente il company_id
         Production::create($validated);
 
         return redirect()->route('production.index')

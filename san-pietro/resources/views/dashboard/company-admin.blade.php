@@ -89,11 +89,18 @@
             <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div class="space-y-2">
-
+                    <a href="{{ route('members.create') }}" class="block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                        Nuovo Socio
+                    </a>
                     <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
                         Nuovo Utente
                     </a>
-
+                    <a href="{{ route('production.create') }}" class="block px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500">
+                        Nuova Produzione
+                    </a>
+                    <a href="{{ route('documents.create') }}" class="block px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-500">
+                        Nuovo DDT
+                    </a>
                 </div>
             </div>
 

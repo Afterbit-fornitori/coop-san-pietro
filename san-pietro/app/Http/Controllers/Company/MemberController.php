@@ -10,7 +10,8 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::where('company_id', auth()->user()->company_id)->get();
+        // Spatie Multi-tenancy gestisce automaticamente lo scoping
+        $members = Member::all();
         return view('company.members.index', compact('members'));
     }
 
@@ -23,15 +24,22 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            // altri campi necessari
+            'tax_code' => 'required|string|size:16|unique:members',
+            'birth_date' => 'required|date',
+            'birth_place' => 'required|string|max:255',
+            'rpm_code' => 'required|string|max:255',
+            'registration_date' => 'required|date',
+            'business_name' => 'required|string|max:255',
+            'plant_location' => 'required|string|max:255',
+            'rpm_notes' => 'nullable|string',
+            'vessel_notes' => 'nullable|string'
         ]);
 
-        $validated['company_id'] = auth()->user()->company_id;
-        Member::create($validated);
+        // Spatie Multi-tenancy imposterà automaticamente il company_id
+        $member = Member::create($validated);
 
         return redirect()->route('members.index')
-            ->with('success', 'Membro creato con successo.');
+            ->with('success', 'Socio creato con successo.');
     }
 
     public function edit(Member $member)
@@ -43,14 +51,21 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            // altri campi necessari
+            'tax_code' => 'required|string|size:16|unique:members,tax_code,' . $member->id,
+            'birth_date' => 'required|date',
+            'birth_place' => 'required|string|max:255',
+            'rpm_code' => 'required|string|max:255',
+            'registration_date' => 'required|date',
+            'business_name' => 'required|string|max:255',
+            'plant_location' => 'required|string|max:255',
+            'rpm_notes' => 'nullable|string',
+            'vessel_notes' => 'nullable|string'
         ]);
 
         $member->update($validated);
 
         return redirect()->route('members.index')
-            ->with('success', 'Membro aggiornato con successo.');
+            ->with('success', 'Socio aggiornato con successo.');
     }
 
     public function destroy(Member $member)
@@ -58,6 +73,6 @@ class MemberController extends Controller
         $member->delete();
 
         return redirect()->route('members.index')
-            ->with('success', 'Membro eliminato con successo.');
+            ->with('success', 'Socio eliminato con successo.');
     }
 }

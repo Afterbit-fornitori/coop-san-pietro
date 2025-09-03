@@ -19,7 +19,7 @@ return [
      * This class should extend `Spatie\Multitenancy\TenantFinder\TenantFinder`
      *
      */
-    'tenant_finder' => \App\Multitenancy\DomainTenantFinder::class,
+    'tenant_finder' => \App\Http\Middleware\UserBasedTenantFinder::class,
 
     /*
      * These fields are used by tenant:artisan command to match one or more tenant.
@@ -43,7 +43,7 @@ return [
      *
      * It must be or extend `Spatie\Multitenancy\Models\Tenant::class`
      */
-    'tenant_model' => Tenant::class,
+    'tenant_model' => \App\Models\Company::class,
 
     /*
      * If there is a current tenant when dispatching a job, the id of the current tenant

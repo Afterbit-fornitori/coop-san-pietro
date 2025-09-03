@@ -11,7 +11,8 @@ class DocumentController extends Controller
 {
     public function index()
     {
-        $documents = Document::where('company_id', auth()->user()->company_id)->get();
+        // Spatie Multi-tenancy gestisce automaticamente lo scoping
+        $documents = Document::all();
         return view('company.documents.index', compact('documents'));
     }
 
@@ -29,7 +30,7 @@ class DocumentController extends Controller
             // altri campi necessari
         ]);
 
-        $validated['company_id'] = auth()->user()->company_id;
+        // Spatie Multi-tenancy imposterà automaticamente il company_id
         $validated['path'] = $request->file('file')->store('documents');
         Document::create($validated);
 

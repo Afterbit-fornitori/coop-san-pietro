@@ -14,14 +14,14 @@ class CompanyPolicy
 
     public function view(User $user, Company $company): bool
     {
-        if ($user->hasRole('super_admin')) {
+        if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
         // Company admin può vedere la propria company e le sue child companies
-        if ($user->hasRole('company_admin')) {
+        if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->id || 
-                   $user->company_id === $company->parent_id;
+                   $user->company_id === $company->parent_company_id;
         }
 
         // Company user può vedere solo la propria company
@@ -35,13 +35,14 @@ class CompanyPolicy
 
     public function update(User $user, Company $company): bool
     {
-        if ($user->hasRole('super_admin')) {
+        if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
-        // Company admin può modificare solo le sue child companies
-        if ($user->hasRole('company_admin')) {
-            return $user->company_id === $company->parent_id;
+        // Company admin può modificare la propria company e le sue child companies
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            return $user->company_id === $company->id || 
+                   $user->company_id === $company->parent_company_id;
         }
 
         return false;
@@ -49,13 +50,13 @@ class CompanyPolicy
 
     public function delete(User $user, Company $company): bool
     {
-        if ($user->hasRole('super_admin')) {
+        if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
-        // Company admin può eliminare solo le sue child companies
-        if ($user->hasRole('company_admin')) {
-            return $user->company_id === $company->parent_id;
+        // Company admin può eliminare solo le sue child companies (non se stessa)
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            return $user->company_id === $company->parent_company_id;
         }
 
         return false;

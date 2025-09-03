@@ -44,14 +44,14 @@
             <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-4">Azioni Rapide</h3>
                 <div class="space-y-2">
-                    <a href="#" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">
+                    <a href="{{ route('documents.create') }}" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">
                         Nuovo DDT
                     </a>
-                    <a href="#" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
-                        Gestione Prodotti
+                    <a href="{{ route('production.index') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+                        Visualizza Produzioni
                     </a>
-                    <a href="#" class="block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500">
-                        Visualizza Report
+                    <a href="{{ route('members.index') }}" class="block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500">
+                        Visualizza Soci
                     </a>
                 </div>
             </div>

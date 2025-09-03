@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('domain')->unique();
-            $table->unsignedBigInteger('parent_id')->nullable();
+            // $table->string('domain')->unique();
+            $table->unsignedBigInteger('parent_company_id')->nullable();
             $table->enum('type', ['parent', 'child']);
             $table->string('vat_number', 11)->nullable()->unique();
             $table->string('tax_code', 16)->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('parent_id')
+            $table->foreign('parent_company_id')
                 ->references('id')
                 ->on('companies')
                 ->onDelete('cascade');
@@ -37,7 +37,7 @@ return new class extends Migration
         // Aggiungiamo company_id alla tabella users
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('company_id')->nullable()->after('id');
-            
+
             $table->foreign('company_id')
                 ->references('id')
                 ->on('companies')
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->dropForeign(['company_id']);
             $table->dropColumn('company_id');
         });
-        
+
         Schema::dropIfExists('companies');
     }
 };

@@ -53,22 +53,36 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         // Creazione ruoli e assegnazione permessi se non esistono già
-        $superAdmin = Role::findOrCreate('super-admin');
+        $superAdmin = Role::findOrCreate('SUPER_ADMIN');
         $superAdmin->syncPermissions(Permission::all());
 
-        $companyAdmin = Role::findOrCreate('company-admin');
+        $companyAdmin = Role::findOrCreate('COMPANY_ADMIN');
         $companyAdmin->syncPermissions([
-            'create companies', 'edit companies', // Solo l'admin di San Pietro può gestire le aziende
+            'create companies',
+            'edit companies', // Solo l'admin di San Pietro può gestire le aziende
             'manage company users', // Ogni admin può gestire i propri utenti
-            'view ddt', 'create ddt', 'edit ddt', 'delete ddt', 'approve ddt',
-            'view products', 'create products', 'edit products', 'delete products',
-            'view suppliers', 'create suppliers', 'edit suppliers', 'delete suppliers',
-            'view reports', 'create reports', 'export reports'
+            'view ddt',
+            'create ddt',
+            'edit ddt',
+            'delete ddt',
+            'approve ddt',
+            'view products',
+            'create products',
+            'edit products',
+            'delete products',
+            'view suppliers',
+            'create suppliers',
+            'edit suppliers',
+            'delete suppliers',
+            'view reports',
+            'create reports',
+            'export reports'
         ]);
 
-        $user = Role::findOrCreate('user');
-        $user->syncPermissions([
-            'view ddt', 'create ddt',
+        $companyUser = Role::findOrCreate('COMPANY_USER');
+        $companyUser->syncPermissions([
+            'view ddt',
+            'create ddt',
             'view products',
             'view suppliers',
             'view reports'
@@ -76,10 +90,17 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Crea la company principale (San Pietro) se non esiste già
         $sanPietro = \App\Models\Company::firstOrCreate(
-            ['domain' => 'san-pietro.test'],
+            ['name' => 'Cooperativa San Pietro'],
             [
-                'name' => 'Cooperativa San Pietro',
                 'type' => 'parent',
+                'parent_company_id' => null,
+                'vat_number' => '12345678901',
+                'tax_code' => 'CSPXXXXXXX01',
+                'address' => 'Via delle Vongole 1',
+                'city' => 'Comacchio',
+                'province' => 'FE',
+                'zip_code' => '44022',
+                'is_active' => true,
                 'settings' => [
                     'allowed_child_companies' => 10,
                     'features' => ['members', 'ddt', 'production']
@@ -87,26 +108,30 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
 
-        // Creazione dell'utente super-admin (Loris) se non esiste già
+        // Creazione dell'utente super-admin se non esiste già
         $superAdminUser = \App\Models\User::updateOrCreate(
-            ['email' => 'loris@example.com'],
+            ['email' => 'super@admin.com'],
             [
-                'name' => 'Loris',
+                'name' => 'Super Admin',
                 'password' => bcrypt('password'), // Password semplificata per test
-                'company_id' => $sanPietro->id
+                'company_id' => null, // SUPER_ADMIN non appartiene a nessuna company specifica
+                'is_active' => true,
+                'email_verified_at' => now()
             ]
         );
-        $superAdminUser->syncRoles(['super-admin']); // Assicura che abbia SOLO il ruolo super-admin
+        $superAdminUser->syncRoles(['SUPER_ADMIN']); // Assicura che abbia SOLO il ruolo super-admin
 
         // Creazione dell'admin di San Pietro se non esiste già
         $sanPietroAdmin = \App\Models\User::firstOrCreate(
-            ['email' => 'manuel.sgarella@gmail.com'],
+            ['email' => 'admin@sanpietro.com'],
             [
-                'name' => 'Manuel',
+                'name' => 'Admin San Pietro',
                 'password' => bcrypt('password'),
-                'company_id' => $sanPietro->id
+                'company_id' => $sanPietro->id,
+                'is_active' => true,
+                'email_verified_at' => now()
             ]
         );
-        $sanPietroAdmin->assignRole('company-admin');
+        $sanPietroAdmin->syncRoles(['COMPANY_ADMIN']);
     }
 }

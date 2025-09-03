@@ -15,15 +15,15 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    @if(auth()->user()->hasRole('super-admin'))
-                        <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
-                            {{ __('Aziende') }}
-                        </x-nav-link>
+                    @if(auth()->user()->hasRole('SUPER_ADMIN'))
+                    <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                        {{ __('Aziende') }}
+                    </x-nav-link>
                     @endif
-                    @if(auth()->user()->hasRole(['super-admin', 'company-admin']))
-                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                            {{ __('Utenti') }}
-                        </x-nav-link>
+                    @if(auth()->user()->hasRole(['SUPER_ADMIN', 'COMPANY_ADMIN']))
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        {{ __('Utenti') }}
+                    </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -53,7 +53,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -80,15 +80,15 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            @if(auth()->user()->hasRole('super-admin'))
-                <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
-                    {{ __('Aziende') }}
-                </x-responsive-nav-link>
+            @if(auth()->user()->hasRole('SUPER_ADMIN'))
+            <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                {{ __('Aziende') }}
+            </x-responsive-nav-link>
             @endif
-            @if(auth()->user()->hasRole(['super-admin', 'company-admin']))
-                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                    {{ __('Utenti') }}
-                </x-responsive-nav-link>
+            @if(auth()->user()->hasRole(['SUPER_ADMIN', 'COMPANY_ADMIN']))
+            <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                {{ __('Utenti') }}
+            </x-responsive-nav-link>
             @endif
         </div>
 
@@ -109,7 +109,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

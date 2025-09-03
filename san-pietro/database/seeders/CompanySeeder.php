@@ -5,85 +5,81 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class CompanySeeder extends Seeder
 {
+    /**
+     * Esegue il seeder per le company.
+     *
+     * Nota: Questo seeder si aspetta che RolesAndPermissionsSeeder
+     * sia già stato eseguito e abbia creato la company principale
+     * e i ruoli necessari.
+     */
     public function run(): void
     {
-        // Crea o recupera la company principale (San Pietro)
-        $sanPietro = Company::firstOrCreate(
-            ['domain' => 'san-pietro.test'],
-            [
-                'name' => 'Cooperativa San Pietro',
-                'type' => 'parent',
-                'is_active' => true
-            ]
-        );
+        // 1. Recupera la company principale (creata nel RolesAndPermissionsSeeder)
+        // Usiamo firstOrFail() per bloccare l'esecuzione se non la trova.
+        $sanPietro = Company::where('name', 'Cooperativa San Pietro')->firstOrFail();
 
-        // Crea il company admin per San Pietro
-        $companyAdmin = User::create([
-            'name' => 'Company Admin',
-            'email' => 'company@san-pietro.test',
-            'password' => bcrypt('password'),
-            'company_id' => $sanPietro->id
-        ]);
-        $companyAdmin->assignRole('company-admin');
-
-        // Crea alcuni utenti standard per San Pietro
+        // 2. Crea alcuni utenti standard per la company principale
+        // Usiamo firstOrCreate() per rendere il seeder eseguibile più volte senza errori.
         for ($i = 1; $i <= 3; $i++) {
-            $user = User::create([
-                'name' => "User $i",
-                'email' => "user$i@san-pietro.test",
-                'password' => bcrypt('password'),
-                'company_id' => $sanPietro->id
-            ]);
-            $user->assignRole('user');
+            $user = User::firstOrCreate(
+                ['email' => "user{$i}@san-pietro.test"],
+                [
+                    'name'              => "User {$i} San Pietro",
+                    'password'          => bcrypt('password'),
+                    'company_id'        => $sanPietro->id,
+                    'email_verified_at' => now(),
+                ]
+            );
+            $user->assignRole('COMPANY_USER');
         }
 
-        // Crea due company figlie
-        $childCompanies = [
-            [
-                'name' => 'Cooperativa Rosa dei Venti',
-                'domain' => 'rosa.local',
-                'type' => 'child'
-            ],
-            [
-                'name' => 'Cooperativa Mosè',
-                'domain' => 'mose.local',
-                'type' => 'child'
-            ]
+        // 3. Definisce i dati per le company figlie
+        $childCompaniesData = [
+            ['name' => 'Cooperativa Rosa dei Venti'],
+            ['name' => 'Cooperativa Mosè']
         ];
 
-        foreach ($childCompanies as $childData) {
-            $child = Company::create([
-                'name' => $childData['name'],
-                'domain' => $childData['domain'],
-                'type' => $childData['type'],
-                'parent_id' => $sanPietro->id,
-                'settings' => [
-                    'features' => ['members', 'ddt', 'production']
+        // 4. Crea ogni company figlia e i suoi utenti
+        foreach ($childCompaniesData as $childData) {
+            $childCompany = Company::firstOrCreate(
+                ['name' => $childData['name']],
+                [
+                    'type'              => 'invited', // Valore corretto per l'enum
+                    'parent_company_id' => $sanPietro->id, // Nome della colonna corretto
+                    'is_active'         => true,
+                    'settings'          => ['features' => ['members', 'ddt', 'production']]
                 ]
-            ]);
+            );
 
-            // Crea un admin per ogni company figlia
-            $childAdmin = User::create([
-                'name' => "Admin " . $childData['name'],
-                'email' => "admin@" . $childData['domain'],
-                'password' => bcrypt('password'),
-                'company_id' => $child->id
-            ]);
-            $childAdmin->assignRole('company-admin');
+            // Genera un indirizzo email univoco dal nome della company
+            $emailDomain = strtolower(str_replace(['Cooperativa ', ' '], '', $childData['name'])) . ".test";
 
-            // Crea un user per ogni company figlia
-            $user = User::create([
-                'name' => "User " . $childData['name'],
-                'email' => "user@" . $childData['domain'],
-                'password' => bcrypt('password'),
-                'company_id' => $child->id
-            ]);
-            $user->assignRole('user');
+            // Crea un admin per la company figlia
+            $childAdmin = User::firstOrCreate(
+                ['email' => "admin@" . $emailDomain],
+                [
+                    'name'              => "Admin " . $childData['name'],
+                    'password'          => bcrypt('password'),
+                    'company_id'        => $childCompany->id,
+                    'email_verified_at' => now(),
+                ]
+            );
+            $childAdmin->assignRole('COMPANY_ADMIN');
+
+            // Crea un utente standard per la company figlia
+            $childUser = User::firstOrCreate(
+                ['email' => "user@" . $emailDomain],
+                [
+                    'name'              => "User " . $childData['name'],
+                    'password'          => bcrypt('password'),
+                    'company_id'        => $childCompany->id,
+                    'email_verified_at' => now(),
+                ]
+            );
+            $childUser->assignRole('COMPANY_USER');
         }
     }
 }

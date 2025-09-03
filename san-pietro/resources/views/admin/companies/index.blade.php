@@ -5,14 +5,15 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">Gestione Aziende</h2>
-                        @if(auth()->user()->hasRole('super-admin') || (auth()->user()->hasRole('company-admin') && auth()->user()->company->domain === 'san-pietro.test'))
-                            <a href="{{ route('admin.companies.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Nuova Azienda
-                            </a>
-                        @endif
-                    </div>                <div class="overflow-x-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold">Gestione Aziende</h2>
+                    @if(auth()->user()->hasRole('SUPER_ADMIN') || (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company->domain === 'san-pietro.test'))
+                    <a href="{{ route('admin.companies.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Nuova Azienda
+                    </a>
+                    @endif
+                </div>
+                <div class="overflow-x-auto">
                     <table class="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden">
                         <thead class="bg-gray-100 dark:bg-gray-600">
                             <tr>
@@ -33,33 +34,33 @@
                                 <td class="py-3 px-4">{{ $company->users->count() }}</td>
                                 <td class="py-3 px-4">
                                     @if($company->is_active)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            Attiva
-                                        </span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Attiva
+                                    </span>
                                     @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                            Inattiva
-                                        </span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Inattiva
+                                    </span>
                                     @endif
                                 </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-3">
-                                        @if(auth()->user()->hasRole('super-admin') || 
-                                            (auth()->user()->hasRole('company-admin') && auth()->user()->company->domain === 'san-pietro.test') || 
-                                            (auth()->user()->hasRole('company-admin') && auth()->user()->company_id === $company->id))
-                                            <a href="{{ route('admin.companies.edit', $company) }}" 
-                                               class="text-indigo-600 hover:text-indigo-900">
-                                                Modifica
-                                            </a>
+                                        @if(auth()->user()->hasRole('super-admin') ||
+                                        (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company->domain === 'san-pietro.test') ||
+                                        (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company_id === $company->id))
+                                        <a href="{{ route('admin.companies.edit', $company) }}"
+                                            class="text-indigo-600 hover:text-indigo-900">
+                                            Modifica
+                                        </a>
                                         @endif
-                                        <form action="{{ route('admin.companies.destroy', $company) }}" 
-                                              method="POST" 
-                                              class="inline-block"
-                                              onsubmit="return confirm('Sei sicuro di voler eliminare questa azienda?');">
+                                        <form action="{{ route('admin.companies.destroy', $company) }}"
+                                            method="POST"
+                                            class="inline-block"
+                                            onsubmit="return confirm('Sei sicuro di voler eliminare questa azienda?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" 
-                                                    class="text-red-600 hover:text-red-900">
+                                            <button type="submit"
+                                                class="text-red-600 hover:text-red-900">
                                                 Elimina
                                             </button>
                                         </form>

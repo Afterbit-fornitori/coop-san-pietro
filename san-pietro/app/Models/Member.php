@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Traits\BelongsToTenant;
 
 class Member extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity, BelongsToTenant;
 
     protected $fillable = [
         'name',
@@ -31,6 +32,12 @@ class Member extends Model
         'registration_date' => 'date'
     ];
 
+    // Definisce quale campo utilizzare per il tenant
+    public function getTenantKeyName(): string
+    {
+        return 'company_id';
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -42,11 +49,6 @@ class Member extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
-    }
-
-    public function scopeForCurrentCompany($query)
-    {
-        return $query->where('company_id', auth()->user()->company_id);
     }
 
     public function productions()

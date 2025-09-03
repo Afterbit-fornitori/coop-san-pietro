@@ -20,15 +20,17 @@ class UserController extends Controller
         $query = User::query()->with(['company', 'roles']);
 
         // Filtra gli utenti in base al ruolo dell'utente corrente
-        if ($request->user()->hasRole('company-admin')) {
+        /** @var User $currentUser */
+        $currentUser = $request->user();
+        if ($currentUser->hasRole('COMPANY_ADMIN')) {
             // Admin della company vede solo gli utenti della sua company e delle company figlie
             $query->whereIn('company_id', [
-                $request->user()->company_id,
-                ...Company::where('parent_id', $request->user()->company_id)->pluck('id')
+                $currentUser->company_id,
+                ...Company::where('parent_company_id', $currentUser->company_id)->pluck('id')
             ]);
-        } elseif (!$request->user()->hasRole('super-admin')) {
+        } elseif (!$currentUser->hasRole('SUPER_ADMIN')) {
             // Utenti normali vedono solo il proprio profilo
-            $query->where('id', $request->user()->id);
+            $query->where('id', $currentUser->id);
         }
 
         $users = $query->paginate(15);

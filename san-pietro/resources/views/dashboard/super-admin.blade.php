@@ -23,8 +23,8 @@
             </div>
 
             <div class="bg-purple-100 dark:bg-purple-800 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold mb-2">Inviti Pendenti</h3>
-                <p class="text-3xl font-bold">{{ $pendingInvites }}</p>
+                <h3 class="text-lg font-semibold mb-2">Aziende Recenti</h3>
+                <p class="text-3xl font-bold">{{ $recentCompanies }}</p>
             </div>
         </div>
 
@@ -47,7 +47,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <a href="{{ route('admin.companies.show', $company) }}" class="hover:text-blue-600">
                                     {{ $company->name }}
-                                    @if($company->parent_id)
+                                    @if($company->parent_company_id)
                                     <span class="text-sm text-gray-500">(Child di {{ $company->parentCompany->name }})</span>
                                     @endif
                                 </a>
@@ -113,14 +113,14 @@
             <div class="bg-white dark:bg-gray-700 shadow rounded-lg p-4">
                 <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div class="space-y-2">
-                    <a href="#" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">
+                    <a href="{{ route('admin.companies.create') }}" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">
                         Nuova Company
                     </a>
-                    <a href="#" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+                    <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
                         Nuovo Utente
                     </a>
-                    <a href="#" class="block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500">
-                        Reports
+                    <a href="{{ route('admin.companies.index') }}" class="block px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-500">
+                        Gestione Companies
                     </a>
                 </div>
             </div>

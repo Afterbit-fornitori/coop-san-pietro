@@ -70,6 +70,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/{document}/edit', [App\Http\Controllers\Company\DocumentController::class, 'edit'])->name('documents.edit');
         Route::put('/documents/{document}', [App\Http\Controllers\Company\DocumentController::class, 'update'])->name('documents.update');
         Route::delete('/documents/{document}', [App\Http\Controllers\Company\DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        Route::get('/invitations', [App\Http\Controllers\Company\InvitationController::class, 'index'])->name('invitations.index');
+        Route::get('/invitations/create', [App\Http\Controllers\Company\InvitationController::class, 'create'])->name('invitations.create');
+        Route::post('/invitations', [App\Http\Controllers\Company\InvitationController::class, 'store'])->name('invitations.store');
+        Route::get('/invitations/{invitation}', [App\Http\Controllers\Company\InvitationController::class, 'show'])->name('invitations.show');
+        Route::post('/invitations/{invitation}/resend', [App\Http\Controllers\Company\InvitationController::class, 'resend'])->name('invitations.resend');
+        Route::delete('/invitations/{invitation}', [App\Http\Controllers\Company\InvitationController::class, 'destroy'])->name('invitations.destroy');
     });
 });
 
