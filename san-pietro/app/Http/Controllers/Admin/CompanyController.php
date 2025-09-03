@@ -12,16 +12,18 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        // $user = User::find(auth()->id());
         $user = User::find(Auth::id());
-        
+        $query = Company::with(['users', 'parentCompany', 'childCompanies']);
+
         if ($user->hasRole('super-admin')) {
-            $companies = Company::with('users')->get();
-        } elseif ($user->hasRole('company-admin') && $user->company->domain === 'san-pietro.test') {
-            $companies = Company::with('users')->get();
+            $companies = $query->get();
+        } elseif ($user->hasRole('company-admin')) {
+            $companies = $query->where(function ($q) use ($user) {
+                $q->where('id', $user->company_id)
+                    ->orWhere('parent_id', $user->company_id);
+            })->get();
         } else {
-            $companies = Company::with('users')
-                ->where('id', $user->company_id)
+            $companies = $query->where('id', $user->company_id)
                 ->where('is_active', true)
                 ->get();
         }

@@ -18,14 +18,57 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Routes per area amministrativa
+    Route::prefix('admin')->name('admin.')->middleware(['check.company.access'])->group(function () {
+        // Companies routes
+        Route::get('/companies', [App\Http\Controllers\Admin\CompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/create', [App\Http\Controllers\Admin\CompanyController::class, 'create'])->name('companies.create');
+        Route::post('/companies', [App\Http\Controllers\Admin\CompanyController::class, 'store'])->name('companies.store');
+        Route::get('/companies/{company}', [App\Http\Controllers\Admin\CompanyController::class, 'show'])->name('companies.show');
+        Route::get('/companies/{company}/edit', [App\Http\Controllers\Admin\CompanyController::class, 'edit'])->name('companies.edit');
+        Route::put('/companies/{company}', [App\Http\Controllers\Admin\CompanyController::class, 'update'])->name('companies.update');
+        Route::delete('/companies/{company}', [App\Http\Controllers\Admin\CompanyController::class, 'destroy'])->name('companies.destroy');
+        Route::patch('/companies/{company}/toggle-status', [App\Http\Controllers\Admin\CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
+        
+        Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+    });
+
+    // Routes per Company Admin e User
+    Route::middleware(['tenant'])->group(function () {
+        Route::get('/members', [App\Http\Controllers\Company\MemberController::class, 'index'])->name('members.index');
+        Route::get('/members/create', [App\Http\Controllers\Company\MemberController::class, 'create'])->name('members.create');
+        Route::post('/members', [App\Http\Controllers\Company\MemberController::class, 'store'])->name('members.store');
+        Route::get('/members/{member}/edit', [App\Http\Controllers\Company\MemberController::class, 'edit'])->name('members.edit');
+        Route::put('/members/{member}', [App\Http\Controllers\Company\MemberController::class, 'update'])->name('members.update');
+        Route::delete('/members/{member}', [App\Http\Controllers\Company\MemberController::class, 'destroy'])->name('members.destroy');
+
+        Route::get('/production', [App\Http\Controllers\Company\ProductionController::class, 'index'])->name('production.index');
+        Route::get('/production/create', [App\Http\Controllers\Company\ProductionController::class, 'create'])->name('production.create');
+        Route::post('/production', [App\Http\Controllers\Company\ProductionController::class, 'store'])->name('production.store');
+        Route::get('/production/{production}/edit', [App\Http\Controllers\Company\ProductionController::class, 'edit'])->name('production.edit');
+        Route::put('/production/{production}', [App\Http\Controllers\Company\ProductionController::class, 'update'])->name('production.update');
+
+        Route::get('/documents', [App\Http\Controllers\Company\DocumentController::class, 'index'])->name('documents.index');
+        Route::get('/documents/create', [App\Http\Controllers\Company\DocumentController::class, 'create'])->name('documents.create');
+        Route::post('/documents', [App\Http\Controllers\Company\DocumentController::class, 'store'])->name('documents.store');
+        Route::get('/documents/{document}/edit', [App\Http\Controllers\Company\DocumentController::class, 'edit'])->name('documents.edit');
+        Route::put('/documents/{document}', [App\Http\Controllers\Company\DocumentController::class, 'update'])->name('documents.update');
+        Route::delete('/documents/{document}', [App\Http\Controllers\Company\DocumentController::class, 'destroy'])->name('documents.destroy');
+    });
 });
 
 require __DIR__.'/auth.php';
