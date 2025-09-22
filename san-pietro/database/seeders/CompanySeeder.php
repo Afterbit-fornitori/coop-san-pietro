@@ -47,10 +47,11 @@ class CompanySeeder extends Seeder
             $childCompany = Company::firstOrCreate(
                 ['name' => $childData['name']],
                 [
-                    'type'              => 'invited', // Valore corretto per l'enum
-                    'parent_company_id' => $sanPietro->id, // Nome della colonna corretto
+                    'type'              => 'invited',
                     'is_active'         => true,
-                    'settings'          => ['features' => ['members', 'ddt', 'production']]
+                    'parent_company_id' => $sanPietro->id,
+                    // 'active'            => true,
+                    'impostazioni'      => ['features' => ['members', 'ddt', 'production']]
                 ]
             );
 

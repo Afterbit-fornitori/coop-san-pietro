@@ -33,8 +33,8 @@
                         @foreach($productions as $production)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-medium">{{ $production->member->name ?? 'N/A' }}</div>
-                                <div class="text-sm text-gray-500">{{ $production->member->business_name ?? '' }}</div>
+                                <div class="font-medium">{{ $production->member->full_name ?? 'N/A' }}</div>
+                                <div class="text-sm text-gray-500">{{ $production->member->rpm_registration ?? '' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium">Settimana {{ $production->week_number }}</div>

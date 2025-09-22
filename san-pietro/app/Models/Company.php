@@ -12,26 +12,26 @@ use Spatie\Multitenancy\Models\Tenant;
 class Company extends Tenant
 {
     use SoftDeletes, LogsActivity;
-    
+
     protected $fillable = [
         'name',
         'parent_company_id',
-        'type', // 'master', 'main', 'invited'
+        'type',
         'vat_number',
         'tax_code',
         'address',
         'city',
         'province',
-        'zip_code',
+        'postal_code',
         'phone',
         'email',
         'pec',
-        'settings',
+        'impostazioni',
         'is_active'
     ];
 
     protected $casts = [
-        'settings' => 'array',
+        'impostazioni' => 'array',
         'is_active' => 'boolean'
     ];
 
@@ -39,8 +39,15 @@ class Company extends Tenant
     {
         return LogOptions::defaults()
             ->logOnly([
-                'name', 'domain', 'type', 'vat_number', 'tax_code',
-                'address', 'city', 'province', 'zip_code', 'is_active'
+                'name',
+                'type',
+                'vat_number',
+                'tax_code',
+                'address',
+                'city',
+                'province',
+                'postal_code',
+                'is_active'
             ])
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Company has been {$eventName}");
@@ -66,9 +73,34 @@ class Company extends Tenant
         return $this->hasMany(Member::class);
     }
 
-    public function productions(): HasMany
+    public function weeklyRecords(): HasMany
     {
-        return $this->hasMany(Production::class);
+        return $this->hasMany(WeeklyRecord::class);
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class);
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function productionZones(): HasMany
+    {
+        return $this->hasMany(ProductionZone::class);
+    }
+
+    public function transportDocuments(): HasMany
+    {
+        return $this->hasMany(TransportDocument::class);
+    }
+
+    public function loadingUnloadingRegisters(): HasMany
+    {
+        return $this->hasMany(LoadingUnloadingRegister::class);
     }
 
     public function documents(): HasMany

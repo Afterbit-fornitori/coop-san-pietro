@@ -9,7 +9,7 @@ class CompanyPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view_companies');
+        return $user->hasPermissionTo('view companies');
     }
 
     public function view(User $user, Company $company): bool
@@ -20,8 +20,8 @@ class CompanyPolicy
 
         // Company admin può vedere la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $company->id || 
-                   $user->company_id === $company->parent_company_id;
+            return $user->company_id === $company->id ||
+                $user->company_id === $company->parent_company_id;
         }
 
         // Company user può vedere solo la propria company
@@ -30,7 +30,7 @@ class CompanyPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create_companies');
+        return $user->hasPermissionTo('create companies');
     }
 
     public function update(User $user, Company $company): bool
@@ -41,8 +41,8 @@ class CompanyPolicy
 
         // Company admin può modificare la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $company->id || 
-                   $user->company_id === $company->parent_company_id;
+            return $user->company_id === $company->id ||
+                $user->company_id === $company->parent_company_id;
         }
 
         return false;
@@ -64,7 +64,7 @@ class CompanyPolicy
 
     public function invite(User $user, Company $company): bool
     {
-        return $user->hasPermissionTo('invite_companies') && 
-               $user->company_id === $company->id;
+        return $user->hasPermissionTo('invite_companies') &&
+            $user->company_id === $company->id;
     }
 }

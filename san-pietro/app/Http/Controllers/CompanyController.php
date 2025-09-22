@@ -11,7 +11,7 @@ class CompanyController extends Controller
     {
         $user = $request->user();
 
-        if ($user->hasRole('super-admin') || ($user->hasRole('company-admin') && $user->company->domain === 'san-pietro.test')) {
+        if ($user->hasRole('super-admin') || ($user->hasRole('COMPANY_ADMIN') && $user->company->domain === 'san-pietro.test')) {
             // Super admin e admin di San Pietro vedono tutte le aziende
             $companies = Company::all();
         } else {
@@ -49,8 +49,10 @@ class CompanyController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->hasRole('super-admin') && 
-            !($user->hasRole('company-admin') && $user->company->domain === 'san-pietro.test')) {
+        if (
+            !$user->hasRole('super-admin') &&
+            !($user->hasRole('COMPANY_ADMIN') && $user->company->domain === 'san-pietro.test')
+        ) {
             // Se non è super admin o admin di San Pietro, può vedere solo la propria azienda attiva
             if ($company->id !== $user->company_id || !$company->is_active) {
                 abort(403);
@@ -64,8 +66,10 @@ class CompanyController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->hasRole('super-admin') && 
-            !($user->hasRole('company-admin') && $user->company->domain === 'san-pietro.test')) {
+        if (
+            !$user->hasRole('super-admin') &&
+            !($user->hasRole('COMPANY_ADMIN') && $user->company->domain === 'san-pietro.test')
+        ) {
             abort(403);
         }
 

@@ -30,6 +30,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Routes per area amministrativa
 
     Route::prefix('admin')->name('admin.')->middleware(['check.company.access'])->group(function () {
+        // Dashboard route
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
         // Companies routes
         Route::get('/companies', [App\Http\Controllers\Admin\CompanyController::class, 'index'])->name('companies.index');
         Route::get('/companies/create', [App\Http\Controllers\Admin\CompanyController::class, 'create'])->name('companies.create');
@@ -77,6 +80,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/invitations/{invitation}', [App\Http\Controllers\Company\InvitationController::class, 'show'])->name('invitations.show');
         Route::post('/invitations/{invitation}/resend', [App\Http\Controllers\Company\InvitationController::class, 'resend'])->name('invitations.resend');
         Route::delete('/invitations/{invitation}', [App\Http\Controllers\Company\InvitationController::class, 'destroy'])->name('invitations.destroy');
+
+        // Weekly Records routes
+        Route::get('/weekly-records', [App\Http\Controllers\Company\WeeklyRecordController::class, 'index'])->name('weekly-records.index');
+        Route::get('/weekly-records/create', [App\Http\Controllers\Company\WeeklyRecordController::class, 'create'])->name('weekly-records.create');
+        Route::post('/weekly-records', [App\Http\Controllers\Company\WeeklyRecordController::class, 'store'])->name('weekly-records.store');
+        Route::get('/weekly-records/{weeklyRecord}', [App\Http\Controllers\Company\WeeklyRecordController::class, 'show'])->name('weekly-records.show');
+        Route::get('/weekly-records/{weeklyRecord}/edit', [App\Http\Controllers\Company\WeeklyRecordController::class, 'edit'])->name('weekly-records.edit');
+        Route::put('/weekly-records/{weeklyRecord}', [App\Http\Controllers\Company\WeeklyRecordController::class, 'update'])->name('weekly-records.update');
+        Route::delete('/weekly-records/{weeklyRecord}', [App\Http\Controllers\Company\WeeklyRecordController::class, 'destroy'])->name('weekly-records.destroy');
+
+        // Clients routes
+        Route::get('/clients', [App\Http\Controllers\Company\ClientController::class, 'index'])->name('clients.index');
+        Route::get('/clients/create', [App\Http\Controllers\Company\ClientController::class, 'create'])->name('clients.create');
+        Route::post('/clients', [App\Http\Controllers\Company\ClientController::class, 'store'])->name('clients.store');
+        Route::get('/clients/{client}', [App\Http\Controllers\Company\ClientController::class, 'show'])->name('clients.show');
+        Route::get('/clients/{client}/edit', [App\Http\Controllers\Company\ClientController::class, 'edit'])->name('clients.edit');
+        Route::put('/clients/{client}', [App\Http\Controllers\Company\ClientController::class, 'update'])->name('clients.update');
+        Route::delete('/clients/{client}', [App\Http\Controllers\Company\ClientController::class, 'destroy'])->name('clients.destroy');
     });
 });
 

@@ -21,11 +21,11 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                     <thead>
                         <tr class="bg-gray-50 dark:bg-gray-800">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome Completo</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codice Fiscale</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ragione Sociale</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Codice RPM</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Iscrizione</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matricola RPM</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Iscrizione RPM</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contatti</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
                         </tr>
                     </thead>
@@ -33,13 +33,20 @@
                         @foreach($members as $member)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-medium">{{ $member->name }}</div>
+                                <div class="font-medium">{{ $member->full_name }}</div>
                                 <div class="text-sm text-gray-500">{{ $member->birth_place }}, {{ $member->birth_date->format('d/m/Y') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $member->tax_code }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $member->business_name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $member->rpm_code }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $member->registration_date->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $member->rpm_registration }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $member->rpm_registration_date->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($member->phone)
+                                    <div class="text-sm">📞 {{ $member->phone }}</div>
+                                @endif
+                                @if($member->email)
+                                    <div class="text-sm">✉️ {{ $member->email }}</div>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <a href="{{ route('members.edit', $member) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                     Modifica
@@ -47,7 +54,7 @@
                                 <form action="{{ route('members.destroy', $member) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" 
+                                    <button type="submit" class="text-red-600 hover:text-red-900"
                                             onclick="return confirm('Sei sicuro di voler eliminare questo socio?')">
                                         Elimina
                                     </button>

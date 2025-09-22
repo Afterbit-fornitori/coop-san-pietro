@@ -14,17 +14,19 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // $table->string('domain')->unique();
             $table->unsignedBigInteger('parent_company_id')->nullable();
-            $table->enum('type', ['parent', 'child']);
+            $table->enum('type', ['master', 'main', 'invited']);
             $table->string('vat_number', 11)->nullable()->unique();
             $table->string('tax_code', 16)->nullable();
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->string('province', 2)->nullable();
-            $table->string('zip_code', 10)->nullable();
+            $table->string('postal_code', 10)->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('pec')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->json('settings')->nullable();
+            $table->json('impostazioni')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

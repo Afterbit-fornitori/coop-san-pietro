@@ -9,31 +9,26 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Traits\BelongsToTenant;
 
-class Member extends Model
+class Client extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity, BelongsToTenant;
 
     protected $fillable = [
-        'last_name',
-        'first_name',
+        'company_id',
+        'business_name',
+        'vat_number',
         'tax_code',
-        'birth_date',
-        'birth_place',
-        'rpm_registration',
-        'rpm_registration_date',
+        'address',
+        'city',
+        'postal_code',
+        'province',
+        'pec',
         'phone',
-        'email',
-        'is_active',
-        'company_id'
+        'sdi_code',
+        'note',
+        'is_active'
     ];
 
-    protected $casts = [
-        'birth_date' => 'date',
-        'rpm_registration_date' => 'date',
-        'is_active' => 'boolean'
-    ];
-
-    // Definisce quale campo utilizzare per il tenant
     public function getTenantKeyName(): string
     {
         return 'company_id';
@@ -47,19 +42,23 @@ class Member extends Model
             ->dontSubmitEmptyLogs();
     }
 
+    // Relazioni
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function weeklyRecords()
+    public function transportDocuments()
     {
-        return $this->hasMany(WeeklyRecord::class);
+        return $this->hasMany(TransportDocument::class);
     }
 
-    // Accessor for full name
-    public function getFullNameAttribute()
+    // Accessor for complete address
+    public function getFullAddressAttribute()
     {
-        return trim($this->last_name . ' ' . $this->first_name);
+        $address = collect([$this->address, $this->city, $this->province, $this->postal_code])
+            ->filter()
+            ->implode(', ');
+        return $address;
     }
 }

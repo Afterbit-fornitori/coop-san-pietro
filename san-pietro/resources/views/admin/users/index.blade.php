@@ -28,7 +28,7 @@
                             <tr>
                                 <td class="py-3 px-4">{{ $user->name }}</td>
                                 <td class="py-3 px-4">{{ $user->email }}</td>
-                                <td class="py-3 px-4">{{ $user->company->name }}</td>
+                                <td class="py-3 px-4">{{ $user->company ? $user->company->name : 'Nessuna azienda' }}</td>
                                 <td class="py-3 px-4">
                                     @foreach($user->roles as $role)
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">

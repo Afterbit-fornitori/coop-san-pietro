@@ -23,17 +23,20 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'tax_code' => 'required|string|size:16|unique:members',
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'tax_code' => 'required|string|size:16|unique:members,tax_code',
             'birth_date' => 'required|date',
             'birth_place' => 'required|string|max:255',
-            'rpm_code' => 'required|string|max:255',
-            'registration_date' => 'required|date',
-            'business_name' => 'required|string|max:255',
-            'plant_location' => 'required|string|max:255',
-            'rpm_notes' => 'nullable|string',
-            'vessel_notes' => 'nullable|string'
+            'rpm_registration' => 'required|string|max:255',
+            'rpm_registration_date' => 'required|date',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'is_active' => 'nullable|boolean'
         ]);
+
+        // Assicura che is_active sia impostato correttamente
+        $validated['is_active'] = $request->has('is_active') ? true : false;
 
         // Spatie Multi-tenancy imposterà automaticamente il company_id
         $member = Member::create($validated);
@@ -50,17 +53,20 @@ class MemberController extends Controller
     public function update(Request $request, Member $member)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
             'tax_code' => 'required|string|size:16|unique:members,tax_code,' . $member->id,
             'birth_date' => 'required|date',
             'birth_place' => 'required|string|max:255',
-            'rpm_code' => 'required|string|max:255',
-            'registration_date' => 'required|date',
-            'business_name' => 'required|string|max:255',
-            'plant_location' => 'required|string|max:255',
-            'rpm_notes' => 'nullable|string',
-            'vessel_notes' => 'nullable|string'
+            'rpm_registration' => 'required|string|max:255',
+            'rpm_registration_date' => 'required|date',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'is_active' => 'nullable|boolean'
         ]);
+
+        // Assicura che is_active sia impostato correttamente
+        $validated['is_active'] = $request->has('is_active') ? true : false;
 
         $member->update($validated);
 

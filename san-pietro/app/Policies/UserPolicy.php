@@ -8,7 +8,7 @@ class UserPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view_users');
+        return $user->hasPermissionTo('view users');
     }
 
     public function view(User $user, User $model): bool
@@ -19,8 +19,8 @@ class UserPolicy
 
         // Company admin può vedere gli utenti della sua company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $model->company_id || 
-                   ($model->company && $model->company->parent_company_id === $user->company_id);
+            return $user->company_id === $model->company_id ||
+                ($model->company && $model->company->parent_company_id === $user->company_id);
         }
 
         // Gli altri utenti possono vedere solo il proprio profilo
@@ -29,7 +29,7 @@ class UserPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create_users');
+        return $user->hasPermissionTo('create users');
     }
 
     public function update(User $user, User $model): bool
@@ -40,8 +40,8 @@ class UserPolicy
 
         // Company admin può modificare gli utenti della sua company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $model->company_id || 
-                   ($model->company && $model->company->parent_company_id === $user->company_id);
+            return $user->company_id === $model->company_id ||
+                ($model->company && $model->company->parent_company_id === $user->company_id);
         }
 
         // Gli altri utenti possono modificare solo il proprio profilo

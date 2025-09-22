@@ -9,10 +9,19 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'company_id', 'is_active'])
+            ->setDescriptionForEvent(fn(string $eventName) => "User has been {$eventName}");
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -83,7 +92,7 @@ class User extends Authenticatable implements MustVerifyEmail
             if ($this->company_id === $companyId) {
                 return true;
             }
-            
+
             // Può accedere alle aziende che ha invitato (solo se è l'azienda principale)
             if ($this->company->isMain()) {
                 $invitedCompany = Company::find($companyId);
