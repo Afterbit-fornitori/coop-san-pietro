@@ -15,14 +15,34 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
                     @if(auth()->user()->hasRole('SUPER_ADMIN'))
                     <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
                         {{ __('Aziende') }}
                     </x-nav-link>
-                    @endif
-                    @if(auth()->user()->hasRole(['SUPER_ADMIN', 'COMPANY_ADMIN']))
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                         {{ __('Utenti') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->hasRole('COMPANY_ADMIN'))
+                    <x-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
+                        {{ __('Inviti') }}
+                    </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->hasRole(['COMPANY_ADMIN', 'COMPANY_USER']))
+                    <x-nav-link :href="route('members.index')" :active="request()->routeIs('members.*')">
+                        {{ __('Soci') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('weekly-records.index')" :active="request()->routeIs('weekly-records.*')">
+                        {{ __('Produzione') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                        {{ __('DDT') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                        {{ __('Clienti') }}
                     </x-nav-link>
                     @endif
                 </div>
@@ -80,14 +100,34 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
             @if(auth()->user()->hasRole('SUPER_ADMIN'))
             <x-responsive-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
                 {{ __('Aziende') }}
             </x-responsive-nav-link>
-            @endif
-            @if(auth()->user()->hasRole(['SUPER_ADMIN', 'COMPANY_ADMIN']))
             <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                 {{ __('Utenti') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->hasRole('COMPANY_ADMIN'))
+            <x-responsive-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
+                {{ __('Inviti') }}
+            </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->hasRole(['COMPANY_ADMIN', 'COMPANY_USER']))
+            <x-responsive-nav-link :href="route('members.index')" :active="request()->routeIs('members.*')">
+                {{ __('Soci') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('weekly-records.index')" :active="request()->routeIs('weekly-records.*')">
+                {{ __('Produzione') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('documents.index')" :active="request()->routeIs('documents.*')">
+                {{ __('DDT') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
+                {{ __('Clienti') }}
             </x-responsive-nav-link>
             @endif
         </div>

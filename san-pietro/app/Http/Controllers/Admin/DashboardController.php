@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\Models\Activity;
 
 class DashboardController extends Controller
@@ -16,6 +17,13 @@ class DashboardController extends Controller
         $usersCount = User::count();
         $recentActivities = Activity::whereDate('created_at', '>=', now()->subDay())->count();
         $recentCompanies = Company::latest()->take(5)->get();
+
+        Log::info('Dashboard Data:', [
+            'companiesCount' => $companiesCount,
+            'usersCount' => $usersCount,
+            'recentActivities' => $recentActivities,
+            'recentCompanies' => $recentCompanies
+        ]);
 
         return view('admin.dashboard', compact(
             'companiesCount',

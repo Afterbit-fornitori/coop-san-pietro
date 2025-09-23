@@ -9,8 +9,7 @@ class MemberPolicy
 {
     public function viewAny(User $user): bool
     {
-        // Tutti i ruoli possono visualizzare la lista membri (filtrata dal loro scope)
-        return $user->hasAnyRole(['SUPER_ADMIN', 'COMPANY_ADMIN', 'COMPANY_USER']);
+        return $user->hasPermissionTo('view members');
     }
 
     public function view(User $user, Member $member): bool
@@ -37,9 +36,7 @@ class MemberPolicy
 
     public function create(User $user): bool
     {
-        // Tutti i ruoli possono creare membri nella propria company
-        return $user->hasAnyRole(['SUPER_ADMIN', 'COMPANY_ADMIN', 'COMPANY_USER']) && 
-               $user->company_id !== null;
+        return $user->hasPermissionTo('create members') && $user->company_id !== null;
     }
 
     public function update(User $user, Member $member): bool
@@ -48,17 +45,9 @@ class MemberPolicy
             return true;
         }
 
-        // COMPANY_ADMIN può modificare i membri della propria company
-        if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $member->company_id;
-        }
-
-        // COMPANY_USER può modificare i membri della propria company
-        if ($user->hasRole('COMPANY_USER')) {
-            return $user->company_id === $member->company_id;
-        }
-
-        return false;
+        // Solo la propria company può modificare i soci
+        return $user->company_id === $member->company_id &&
+               $user->hasPermissionTo('edit members');
     }
 
     public function delete(User $user, Member $member): bool
@@ -67,23 +56,21 @@ class MemberPolicy
             return true;
         }
 
-        // Solo COMPANY_ADMIN può eliminare membri della propria company
-        if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $member->company_id;
-        }
-
-        return false;
+        // Solo COMPANY_ADMIN può eliminare soci della propria company
+        return $user->hasRole('COMPANY_ADMIN') &&
+               $user->company_id === $member->company_id &&
+               $user->hasPermissionTo('delete members');
     }
 
-    public function viewProductions(User $user, Member $member): bool
+    public function viewWeeklyRecords(User $user, Member $member): bool
     {
-        // Stesse regole del view standard
+        // Stesse regole del view standard per i record settimanali
         return $this->view($user, $member);
     }
 
-    public function manageProductions(User $user, Member $member): bool
+    public function manageWeeklyRecords(User $user, Member $member): bool
     {
-        // Solo la propria company può gestire le produzioni
+        // Solo la propria company può gestire i record settimanali
         return $user->company_id === $member->company_id;
     }
 }

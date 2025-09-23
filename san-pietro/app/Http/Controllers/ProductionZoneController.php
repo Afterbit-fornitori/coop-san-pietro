@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductionZone;
@@ -8,16 +8,20 @@ use Illuminate\Http\Request;
 
 class ProductionZoneController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(ProductionZone::class, 'production_zone');
+    }
     public function index()
     {
         // Spatie Multi-tenancy gestisce automaticamente lo scoping
-        $zones = ProductionZone::all();
-        return view('company.production-zones.index', compact('zones'));
+        $zones = ProductionZone::orderBy('nome')->paginate(15);
+        return view('production-zones.index', compact('zones'));
     }
 
     public function create()
     {
-        return view('company.production-zones.create');
+        return view('production-zones.create');
     }
 
     public function store(Request $request)
@@ -36,6 +40,7 @@ class ProductionZoneController extends Controller
         $validated['is_active'] = $request->has('is_active') ? true : false;
 
         // Spatie Multi-tenancy imposterà automaticamente il company_id
+        $validated['company_id'] = auth()->user()->company_id;
         ProductionZone::create($validated);
 
         return redirect()->route('production-zones.index')
@@ -44,7 +49,7 @@ class ProductionZoneController extends Controller
 
     public function edit(ProductionZone $zone)
     {
-        return view('company.production-zones.edit', compact('zone'));
+        return view('production-zones.edit', compact('zone'));
     }
 
     public function update(Request $request, ProductionZone $zone)

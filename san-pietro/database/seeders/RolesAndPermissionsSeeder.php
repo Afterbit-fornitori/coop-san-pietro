@@ -13,39 +13,16 @@ class RolesAndPermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Lista di tutti i permessi necessari
+        // Lista di tutti i permessi necessari basata sulla struttura Excel
         $permissions = [
-            // Permessi per le companies
+            // Gestione Aziende (solo SUPER_ADMIN e COMPANY_ADMIN di San Pietro)
             'view companies',
             'create companies',
             'edit companies',
             'delete companies',
-            'manage company users',
+            'invite companies',
 
-            // Permessi per i DDT
-            'view ddt',
-            'create ddt',
-            'edit ddt',
-            'delete ddt',
-            'approve ddt',
-
-            // Permessi per i prodotti
-            'view products',
-            'create products',
-            'edit products',
-            'delete products',
-
-            // Permessi per i fornitori
-            'view suppliers',
-            'create suppliers',
-            'edit suppliers',
-            'delete suppliers',
-
-            // Permessi per i report
-            'view reports',
-            'create reports',
-            'export reports',
-            // Permessi per gli utenti
+            // Gestione Utenti
             'view users',
             'create users',
             'edit users',
@@ -53,7 +30,55 @@ class RolesAndPermissionsSeeder extends Seeder
             'assign roles',
             'toggle user status',
 
-            // Permessi per le impostazioni
+            // Gestione Soci (Members - da Excel SOCI)
+            'view members',
+            'create members',
+            'edit members',
+            'delete members',
+
+            // Record Settimanali (da Excel PER FARE LA FATTURA)
+            'view weekly records',
+            'create weekly records',
+            'edit weekly records',
+            'delete weekly records',
+
+            // Clienti (da Excel DATI CLIENTI)
+            'view clients',
+            'create clients',
+            'edit clients',
+            'delete clients',
+
+            // Documenti di Trasporto DDT/DTN/DDR (da Excel COOPERATIVA)
+            'view transport documents',
+            'create transport documents',
+            'edit transport documents',
+            'delete transport documents',
+            'print transport documents',
+
+            // Zone di Produzione (da Excel AREE-MQ)
+            'view production zones',
+            'create production zones',
+            'edit production zones',
+            'delete production zones',
+
+            // Registro Carico/Scarico (da Excel CARICO SCARICO)
+            'view loading unloading',
+            'create loading unloading',
+            'edit loading unloading',
+            'delete loading unloading',
+
+            // Prodotti
+            'view products',
+            'create products',
+            'edit products',
+            'delete products',
+
+            // Report e Analytics
+            'view reports',
+            'export reports',
+            'view analytics',
+
+            // Impostazioni Sistema
             'manage settings',
             'manage roles',
             'manage permissions',
@@ -64,40 +89,103 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::findOrCreate($permission);
         }
 
-        // Creazione ruoli e assegnazione permessi se non esistono già
+        // SUPER_ADMIN: Accesso completo alla piattaforma
         $superAdmin = Role::findOrCreate('SUPER_ADMIN');
         $superAdmin->syncPermissions(Permission::all());
 
+        // COMPANY_ADMIN: San Pietro (principale) - può invitare altre aziende e vedere i loro dati
         $companyAdmin = Role::findOrCreate('COMPANY_ADMIN');
         $companyAdmin->syncPermissions([
+            // Gestione aziende (solo San Pietro può invitare)
+            'view companies',
             'create companies',
-            'edit companies', // Solo l'admin di San Pietro può gestire le aziende
-            'manage company users', // Ogni admin può gestire i propri utenti
-            'view ddt',
-            'create ddt',
-            'edit ddt',
-            'delete ddt',
-            'approve ddt',
+            'edit companies',
+            'invite companies',
+
+            // Gestione utenti della propria azienda e aziende invitate
+            'view users',
+            'create users',
+            'edit users',
+            'delete users',
+            'assign roles',
+
+            // Tutte le funzionalità operative
+            'view members',
+            'create members',
+            'edit members',
+            'delete members',
+
+            'view weekly records',
+            'create weekly records',
+            'edit weekly records',
+            'delete weekly records',
+
+            'view clients',
+            'create clients',
+            'edit clients',
+            'delete clients',
+
+            'view transport documents',
+            'create transport documents',
+            'edit transport documents',
+            'delete transport documents',
+            'print transport documents',
+
+            'view production zones',
+            'create production zones',
+            'edit production zones',
+            'delete production zones',
+
+            'view loading unloading',
+            'create loading unloading',
+            'edit loading unloading',
+            'delete loading unloading',
+
             'view products',
             'create products',
             'edit products',
             'delete products',
-            'view suppliers',
-            'create suppliers',
-            'edit suppliers',
-            'delete suppliers',
+
             'view reports',
-            'create reports',
-            'export reports'
+            'export reports',
+            'view analytics',
         ]);
 
+        // COMPANY_USER: Aziende invitate (Rosa, Mosè e B.) - accesso isolato ai propri dati
         $companyUser = Role::findOrCreate('COMPANY_USER');
         $companyUser->syncPermissions([
-            'view ddt',
-            'create ddt',
+            // Solo visualizzazione e gestione dei propri dati operativi
+            'view members',
+            'create members',
+            'edit members',
+
+            'view weekly records',
+            'create weekly records',
+            'edit weekly records',
+
+            'view clients',
+            'create clients',
+            'edit clients',
+
+            'view transport documents',
+            'create transport documents',
+            'edit transport documents',
+            'print transport documents',
+
+            'view production zones',
+            'create production zones',
+            'edit production zones',
+
+            'view loading unloading',
+            'create loading unloading',
+            'edit loading unloading',
+
             'view products',
-            'view suppliers',
-            'view reports'
+            'create products',
+            'edit products',
+
+            'view reports',
+            'export reports',
         ]);
 
         // Crea la company principale (San Pietro) se non esiste già

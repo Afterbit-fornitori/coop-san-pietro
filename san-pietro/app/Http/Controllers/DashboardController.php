@@ -14,12 +14,15 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         if ($user->hasRole('SUPER_ADMIN')) {
-            return redirect('/admin');
+            return redirect()->route('admin.dashboard');
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
             return redirect()->route('company.dashboard');
+        } elseif ($user->hasRole('COMPANY_USER')) {
+            // COMPANY_USER va alla vista operativa
+            return view('dashboard.company-user');
         }
 
-        // Default view for standard users
+        // Default view for guest users
         return view('dashboard.user');
     }
 }

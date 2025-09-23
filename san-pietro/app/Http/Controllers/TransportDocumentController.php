@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\TransportDocument;
+use App\Models\Client;
+use App\Models\Member;
+use App\Models\ProductionZone;
+use Illuminate\Http\Request;
+
+class TransportDocumentController extends Controller
+{
+    public function __construct()
+    {
+        $this->authorizeResource(TransportDocument::class, 'transport_document');
+    }
+
+    public function index()
+    {
+        $transportDocuments = TransportDocument::with(['client', 'member', 'productionZone'])
+            ->orderBy('data_documento', 'desc')
+            ->paginate(15);
+
+        return view('transport-documents.index', compact('transportDocuments'));
+    }
+
+    public function create()
+    {
+        $clients = Client::orderBy('ragione_sociale')->get();
+        $members = Member::orderBy('cognome')->get();
+        $productionZones = ProductionZone::where('attiva', true)->orderBy('nome')->get();
+
+        return view('transport-documents.create', compact('clients', 'members', 'productionZones'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'member_id' => 'nullable|exists:members,id',
+            'production_zone_id' => 'nullable|exists:production_zones,id',
+            'serie' => 'required|string|max:10',
+            'data_documento' => 'required|date',
+            'ora_partenza' => 'nullable|string',
+            'data_raccolta' => 'nullable|date',
+            'tipo_documento' => 'required|in:DDT,DTN,DDR',
+            'causale_trasporto' => 'required|string|max:255',
+            'mezzo_trasporto' => 'nullable|string|max:255',
+            'annotazioni' => 'nullable|string',
+        ]);
+
+        // Auto-generate numero progressivo per anno corrente
+        $year = date('Y', strtotime($validated['data_documento']));
+        $lastNumber = TransportDocument::where('serie', $validated['serie'])
+            ->where('anno', $year)
+            ->max('numero') ?? 0;
+
+        $validated['numero'] = $lastNumber + 1;
+        $validated['anno'] = $year;
+        $validated['company_id'] = auth()->user()->company_id;
+
+        $transportDocument = TransportDocument::create($validated);
+
+        return redirect()->route('transport-documents.index')
+            ->with('success', 'Documento di trasporto creato con successo.');
+    }
+
+    public function show(TransportDocument $transportDocument)
+    {
+        $transportDocument->load(['client', 'member', 'productionZone', 'items.product']);
+        return view('transport-documents.show', compact('transportDocument'));
+    }
+
+    public function edit(TransportDocument $transportDocument)
+    {
+        $clients = Client::orderBy('ragione_sociale')->get();
+        $members = Member::orderBy('cognome')->get();
+        $productionZones = ProductionZone::where('attiva', true)->orderBy('nome')->get();
+
+        return view('transport-documents.edit', compact('transportDocument', 'clients', 'members', 'productionZones'));
+    }
+
+    public function update(Request $request, TransportDocument $transportDocument)
+    {
+        $validated = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'member_id' => 'nullable|exists:members,id',
+            'production_zone_id' => 'nullable|exists:production_zones,id',
+            'data_documento' => 'required|date',
+            'ora_partenza' => 'nullable|string',
+            'data_raccolta' => 'nullable|date',
+            'tipo_documento' => 'required|in:DDT,DTN,DDR',
+            'causale_trasporto' => 'required|string|max:255',
+            'mezzo_trasporto' => 'nullable|string|max:255',
+            'annotazioni' => 'nullable|string',
+        ]);
+
+        $transportDocument->update($validated);
+
+        return redirect()->route('transport-documents.index')
+            ->with('success', 'Documento di trasporto aggiornato con successo.');
+    }
+
+    public function destroy(TransportDocument $transportDocument)
+    {
+        $transportDocument->delete();
+
+        return redirect()->route('transport-documents.index')
+            ->with('success', 'Documento di trasporto eliminato con successo.');
+    }
+}

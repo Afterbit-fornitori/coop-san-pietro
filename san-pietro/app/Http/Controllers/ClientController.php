@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
@@ -8,15 +8,19 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Client::class, 'client');
+    }
     public function index()
     {
-        $clients = Client::orderBy('ragione_sociale')->get();
-        return view('company.clients.index', compact('clients'));
+        $clients = Client::orderBy('ragione_sociale')->paginate(15);
+        return view('clients.index', compact('clients'));
     }
 
     public function create()
     {
-        return view('company.clients.create');
+        return view('clients.create');
     }
 
     public function store(Request $request)
@@ -41,6 +45,7 @@ class ClientController extends Controller
         // Assicura che is_active sia impostato correttamente
         $validated['is_active'] = $request->has('is_active') ? true : false;
 
+        $validated['company_id'] = auth()->user()->company_id;
         Client::create($validated);
 
         return redirect()->route('clients.index')
@@ -49,12 +54,12 @@ class ClientController extends Controller
 
     public function show(Client $client)
     {
-        return view('company.clients.show', compact('client'));
+        return view('clients.show', compact('client'));
     }
 
     public function edit(Client $client)
     {
-        return view('company.clients.edit', compact('client'));
+        return view('clients.edit', compact('client'));
     }
 
     public function update(Request $request, Client $client)

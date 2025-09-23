@@ -38,7 +38,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
-        'tenant' => [
+        'multitenancy' => [
             \App\Http\Middleware\SwitchTenantMiddleware::class,
             \Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession::class,
         ],
@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        'multitenancy.group' => \Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession::class,
     ];
 }

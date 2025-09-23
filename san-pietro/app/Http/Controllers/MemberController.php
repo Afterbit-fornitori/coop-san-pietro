@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Member;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Member::class, 'member');
+    }
     public function index()
     {
         // Spatie Multi-tenancy gestisce automaticamente lo scoping
-        $members = Member::all();
+        $members = Member::orderBy('cognome')->orderBy('nome')->paginate(15);
         return view('members.index', compact('members'));
     }
 
@@ -23,23 +27,24 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'tax_code' => 'required|string|size:16|unique:members',
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'tax_code' => 'required|string|size:16|unique:members,tax_code',
             'birth_date' => 'required|date',
             'birth_place' => 'required|string|max:255',
-            'rpm_code' => 'required|string|max:255',
-            'registration_date' => 'required|date',
-            'business_name' => 'required|string|max:255',
-            'plant_location' => 'required|string|max:255',
-            'rpm_notes' => 'nullable|string',
-            'vessel_notes' => 'nullable|string'
+            'rpm_registration' => 'required|string|max:255',
+            'rpm_registration_date' => 'required|date',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'is_active' => 'nullable|boolean'
         ]);
 
-        // Spatie Multi-tenancy imposterà automaticamente il company_id
-        $member = Member::create($validated);
+        // Assicura che is_active sia impostato correttamente
+        $validated['is_active'] = $request->has('is_active') ? true : false;
 
-        // Genera automaticamente la struttura di produzione settimanale
-        // TODO: Implementare la logica per la generazione della struttura di produzione
+        // Spatie Multi-tenancy imposterà automaticamente il company_id
+        $validated['company_id'] = auth()->user()->company_id;
+        $member = Member::create($validated);
 
         return redirect()->route('members.index')
             ->with('success', 'Socio creato con successo.');
@@ -47,26 +52,26 @@ class MemberController extends Controller
 
     public function edit(Member $member)
     {
-        $this->authorize('update', $member);
         return view('members.edit', compact('member'));
     }
 
     public function update(Request $request, Member $member)
     {
-        $this->authorize('update', $member);
-
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
             'tax_code' => 'required|string|size:16|unique:members,tax_code,' . $member->id,
             'birth_date' => 'required|date',
             'birth_place' => 'required|string|max:255',
-            'rpm_code' => 'required|string|max:255',
-            'registration_date' => 'required|date',
-            'business_name' => 'required|string|max:255',
-            'plant_location' => 'required|string|max:255',
-            'rpm_notes' => 'nullable|string',
-            'vessel_notes' => 'nullable|string'
+            'rpm_registration' => 'required|string|max:255',
+            'rpm_registration_date' => 'required|date',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'is_active' => 'nullable|boolean'
         ]);
+
+        // Assicura che is_active sia impostato correttamente
+        $validated['is_active'] = $request->has('is_active') ? true : false;
 
         $member->update($validated);
 
@@ -76,7 +81,6 @@ class MemberController extends Controller
 
     public function destroy(Member $member)
     {
-        $this->authorize('delete', $member);
         $member->delete();
 
         return redirect()->route('members.index')
