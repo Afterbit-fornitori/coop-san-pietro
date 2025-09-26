@@ -1,3 +1,39 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Classi sempre incluse per evitare problemi di purge */
+@layer utilities {
+    .bg-blue-100, .bg-blue-600, .bg-blue-700 { }
+    .bg-green-100, .bg-green-600, .bg-green-700 { }
+    .bg-red-100, .bg-red-600, .bg-red-700 { }
+    .bg-yellow-100, .bg-yellow-600, .bg-yellow-700 { }
+    .bg-purple-100, .bg-purple-600, .bg-purple-700 { }
+    .bg-indigo-100, .bg-indigo-600, .bg-indigo-700 { }
+    .bg-emerald-100, .bg-emerald-600, .bg-emerald-700 { }
+    .bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-gray-300, .bg-gray-400, .bg-gray-500, .bg-gray-600, .bg-gray-700, .bg-gray-800, .bg-gray-900 { }
+    .bg-white { }
+
+    .text-blue-600, .text-blue-800, .text-blue-900 { }
+    .text-green-600, .text-green-800, .text-green-900 { }
+    .text-red-600, .text-red-800, .text-red-900 { }
+    .text-yellow-600, .text-yellow-800, .text-yellow-900 { }
+    .text-purple-600, .text-purple-800, .text-purple-900 { }
+    .text-indigo-600, .text-indigo-800, .text-indigo-900 { }
+    .text-emerald-600, .text-emerald-800, .text-emerald-900 { }
+    .text-gray-500, .text-gray-600, .text-gray-700, .text-gray-800, .text-gray-900 { }
+    .text-white { }
+
+    .hover\:bg-blue-700:hover, .hover\:bg-green-700:hover, .hover\:bg-red-700:hover { }
+    .hover\:bg-indigo-700:hover, .hover\:bg-emerald-700:hover { }
+    .hover\:text-blue-900:hover, .hover\:text-green-900:hover, .hover\:text-red-900:hover { }
+    .hover\:text-indigo-900:hover, .hover\:text-yellow-900:hover { }
+
+    .border, .border-gray-200 { }
+    .rounded-md, .rounded-full { }
+    .transition { }
+    .duration-150 { }
+    .font-medium, .font-semibold, .font-bold { }
+    .shadow-sm { }
+    .inline-flex, .items-center, .justify-center { }
+}

@@ -15,6 +15,7 @@ class Company extends Tenant
 
     protected $fillable = [
         'name',
+        'domain',
         'parent_company_id',
         'type',
         'vat_number',
@@ -22,7 +23,7 @@ class Company extends Tenant
         'address',
         'city',
         'province',
-        'postal_code',
+        'zip_code',
         'phone',
         'email',
         'pec',
@@ -40,13 +41,14 @@ class Company extends Tenant
         return LogOptions::defaults()
             ->logOnly([
                 'name',
+                'domain',
                 'type',
                 'vat_number',
                 'tax_code',
                 'address',
                 'city',
                 'province',
-                'postal_code',
+                'zip_code',
                 'is_active'
             ])
             ->logOnlyDirty()
@@ -91,6 +93,11 @@ class Company extends Tenant
     public function productionZones(): HasMany
     {
         return $this->hasMany(ProductionZone::class);
+    }
+
+    public function productions(): HasMany
+    {
+        return $this->hasMany(Production::class);
     }
 
     public function transportDocuments(): HasMany

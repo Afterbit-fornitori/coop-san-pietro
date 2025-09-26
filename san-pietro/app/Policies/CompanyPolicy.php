@@ -14,7 +14,7 @@ class CompanyPolicy
 
     public function view(User $user, Company $company): bool
     {
-        if ($user->hasRole('SUPER_ADMIN')) {
+        if ($user->hasRole('SUPER_ADMIN' || 'COMPANY_ADMIN')) {
             return true;
         }
 
@@ -30,6 +30,11 @@ class CompanyPolicy
 
     public function create(User $user): bool
     {
+        // SUPER_ADMIN può sempre creare aziende
+        if ($user->hasRole('SUPER_ADMIN')) {
+            return true;
+        }
+
         return $user->hasPermissionTo('create companies');
     }
 

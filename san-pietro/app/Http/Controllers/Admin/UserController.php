@@ -39,13 +39,27 @@ class UserController extends Controller
 
     public function create()
     {
-        $companies = Company::all();
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+
+        if ($currentUser->hasRole('SUPER_ADMIN')) {
+            $companies = Company::all();
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company) {
+            // COMPANY_ADMIN vede solo la propria azienda e quelle invitate
+            $companies = $currentUser->getAccessibleCompanies();
+        } else {
+            $companies = collect([]);
+        }
+
         $roles = Role::all();
         return view('admin.users.create', compact('companies', 'roles'));
     }
 
     public function store(Request $request)
     {
+        /** @var User $currentUser */
+        $currentUser = $request->user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -54,11 +68,19 @@ class UserController extends Controller
             'role' => 'required|exists:roles,name'
         ]);
 
+        // Verifica che l'utente possa creare utenti per questa azienda
+        if (!$currentUser->hasRole('SUPER_ADMIN')) {
+            if (!$currentUser->canAccessCompany($validated['company_id'])) {
+                abort(403, 'Non hai i permessi per creare utenti in questa azienda.');
+            }
+        }
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
-            'company_id' => $validated['company_id']
+            'company_id' => $validated['company_id'],
+            'is_active' => true
         ]);
 
         $user->assignRole($validated['role']);
@@ -69,7 +91,18 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $companies = Company::all();
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+
+        if ($currentUser->hasRole('SUPER_ADMIN')) {
+            $companies = Company::all();
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company) {
+            // COMPANY_ADMIN vede solo la propria azienda e quelle invitate
+            $companies = $currentUser->getAccessibleCompanies();
+        } else {
+            $companies = collect([]);
+        }
+
         $roles = Role::all();
         return view('admin.users.edit', compact('user', 'companies', 'roles'));
     }

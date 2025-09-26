@@ -3,8 +3,8 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
                 <div class="mb-6">
                     <h2 class="text-2xl font-semibold">Modifica Azienda</h2>
                 </div>
@@ -15,13 +15,13 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="name" class="block text-sm font-medium text-gray-700">
                                 Nome Azienda
                             </label>
                             <input type="text"
                                 name="name"
                                 id="name"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 value="{{ old('name', $company->name) }}"
                                 required>
                             @error('name')
@@ -30,13 +30,13 @@
                         </div>
 
                         <div>
-                            <label for="domain" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="domain" class="block text-sm font-medium text-gray-700">
                                 Dominio
                             </label>
                             <input type="text"
                                 name="domain"
                                 id="domain"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 value="{{ old('domain', $company->domain) }}"
                                 required>
                             @error('domain')
@@ -45,12 +45,12 @@
                         </div>
 
                         <div>
-                            <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="type" class="block text-sm font-medium text-gray-700">
                                 Tipo
                             </label>
                             <select name="type"
                                 id="type"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required>
                                 <option value="parent" {{ old('type', $company->type) == 'parent' ? 'selected' : '' }}>Parent</option>
                                 <option value="child" {{ old('type', $company->type) == 'child' ? 'selected' : '' }}>Child</option>
@@ -62,12 +62,12 @@
 
                         <!-- <div class="parent-company-field" style="{{ old('type', $company->type) == 'child' ? '' : 'display: none;' }}"> -->
                         <div class="parent-company-field" @if(old('type', $company->type ?? '') != 'child') style="display: none;" @endif>
-                            <label for="parent_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="parent_id" class="block text-sm font-medium text-gray-700">
                                 Azienda Padre
                             </label>
                             <select name="parent_id"
                                 id="parent_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">Seleziona azienda padre</option>
                                 @foreach(\App\Models\Company::where('type', 'parent')->where('id', '!=', $company->id)->get() as $parent)
                                 <option value="{{ $parent->id }}" {{ old('parent_id', $company->parent_id) == $parent->id ? 'selected' : '' }}>
@@ -85,7 +85,7 @@
                         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Aggiorna Azienda
                         </button>
-                        <a href="{{ route('admin.companies.index') }}" class="ml-3 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                        <a href="{{ route('admin.companies.index') }}" class="ml-3 text-gray-600 hover:text-gray-900 dark:hover:text-white">
                             Annulla
                         </a>
                     </div>

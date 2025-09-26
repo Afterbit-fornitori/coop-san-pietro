@@ -11,8 +11,13 @@ class TenantScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
+        // SUPER_ADMIN non ha company_id e può vedere tutto
+        if (auth()->check() && auth()->user()->hasRole('SUPER_ADMIN')) {
+            return;
+        }
+
         $currentTenant = app('currentTenant');
-        
+
         if ($currentTenant) {
             $builder->where($model->getTable() . '.company_id', $currentTenant->id);
         }

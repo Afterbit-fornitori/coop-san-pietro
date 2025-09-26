@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CompanyInvitationMail;
 use App\Models\CompanyInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,12 +17,15 @@ class InvitationController extends Controller
         $this->middleware(function ($request, $next) {
             /** @var User $user */
             $user = auth()->user();
-            
-            // Solo San Pietro (main company) può invitare altre aziende
-            if (!$user->hasRole('COMPANY_ADMIN') || !$user->company->isMain()) {
-                abort(403, 'Solo San Pietro può inviare inviti ad altre aziende.');
+
+            // SUPER_ADMIN o San Pietro (main company) possono invitare altre aziende
+            if (
+                !$user->hasRole('SUPER_ADMIN') &&
+                (!$user->hasRole('COMPANY_ADMIN') || !$user->company->isMain())
+            ) {
+                abort(403, 'Solo il SUPER_ADMIN o San Pietro possono inviare inviti ad altre aziende.');
             }
-            
+
             return $next($request);
         });
     }
@@ -30,7 +34,7 @@ class InvitationController extends Controller
     {
         /** @var User $user */
         $user = auth()->user();
-        
+
         $invitations = CompanyInvitation::where('inviter_company_id', $user->company_id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -69,8 +73,8 @@ class InvitationController extends Controller
             'status' => 'pending'
         ]);
 
-        // TODO: Inviare email di invito
-        // Mail::to($validated['email'])->send(new CompanyInvitationMail($invitation));
+        // Invia email di invito
+        Mail::to($validated['email'])->send(new CompanyInvitationMail($invitation));
 
         return redirect()->route('invitations.index')
             ->with('success', "Invito inviato a {$validated['company_name']} ({$validated['email']}).");
@@ -93,8 +97,8 @@ class InvitationController extends Controller
             'token' => Str::random(64)
         ]);
 
-        // TODO: Inviare email di invito
-        // Mail::to($invitation->email)->send(new CompanyInvitationMail($invitation));
+        // Invia email di invito
+        Mail::to($invitation->email)->send(new CompanyInvitationMail($invitation));
 
         return back()->with('success', 'Invito reinviato con successo.');
     }
@@ -106,5 +110,22 @@ class InvitationController extends Controller
 
         return redirect()->route('invitations.index')
             ->with('success', "Invito per {$companyName} eliminato con successo.");
+    }
+
+    public function accept(string $token)
+    {
+        $invitation = CompanyInvitation::where('token', $token)
+            ->where('status', 'pending')
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$invitation) {
+            return redirect()->route('login')
+                ->withErrors(['error' => 'Invito non valido o scaduto.']);
+        }
+
+        // Reindirizza alla pagina di registrazione con i dati dell'invito
+        return redirect()->route('register')
+            ->with('invitation', $invitation);
     }
 }

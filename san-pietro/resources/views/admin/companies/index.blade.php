@@ -3,19 +3,19 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold">Gestione Aziende</h2>
-                    @if(auth()->user()->hasRole('SUPER_ADMIN') || (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company->domain === 'san-pietro.test'))
+                    @if(auth()->user()->hasRole('SUPER_ADMIN') || (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company && auth()->user()->company->isMain()))
                     <a href="{{ route('admin.companies.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Nuova Azienda
                     </a>
                     @endif
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden">
-                        <thead class="bg-gray-100 dark:bg-gray-600">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-3 px-4 text-left">Nome</th>
                                 <th class="py-3 px-4 text-left">Dominio</th>
@@ -25,7 +25,7 @@
                                 <th class="py-3 px-4 text-left">Azioni</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-500">
+                        <tbody class="divide-y divide-gray-200">
                             @foreach($companies as $company)
                             <tr>
                                 <td class="py-3 px-4">{{ $company->name }}</td>
@@ -45,8 +45,8 @@
                                 </td>
                                 <td class="py-3 px-4">
                                     <div class="flex space-x-3">
-                                        @if(auth()->user()->hasRole('super-admin') ||
-                                        (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company->domain === 'san-pietro.test') ||
+                                        @if(auth()->user()->hasRole('SUPER_ADMIN') ||
+                                        (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company && auth()->user()->company->isMain()) ||
                                         (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company_id === $company->id))
                                         <a href="{{ route('admin.companies.edit', $company) }}"
                                             class="text-indigo-600 hover:text-indigo-900">

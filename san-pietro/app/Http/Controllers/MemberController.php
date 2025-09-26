@@ -15,7 +15,7 @@ class MemberController extends Controller
     public function index()
     {
         // Spatie Multi-tenancy gestisce automaticamente lo scoping
-        $members = Member::orderBy('cognome')->orderBy('nome')->paginate(15);
+        $members = Member::orderBy('last_name')->orderBy('first_name')->paginate(15);
         return view('members.index', compact('members'));
     }
 

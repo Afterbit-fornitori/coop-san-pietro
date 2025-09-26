@@ -13,15 +13,16 @@ class WeeklyRecordController extends Controller
     {
         $this->authorizeResource(WeeklyRecord::class, 'weekly_record');
     }
+
     public function index()
     {
-        $weeklyRecords = WeeklyRecord::with('member')->orderBy('anno', 'desc')->orderBy('settimana', 'desc')->paginate(15);
+        $weeklyRecords = WeeklyRecord::with('member')->orderBy('year', 'desc')->orderBy('week', 'desc')->paginate(15);
         return view('weekly-records.index', compact('weeklyRecords'));
     }
 
     public function create()
     {
-        $members = Member::where('active', true)->orderBy('last_name')->orderBy('first_name')->get();
+        $members = Member::where('is_active', true)->orderBy('last_name')->orderBy('first_name')->get();
         return view('weekly-records.create', compact('members'));
     }
 
@@ -31,32 +32,47 @@ class WeeklyRecordController extends Controller
             'member_id' => 'required|exists:members,id',
             'year' => 'required|integer|min:2020|max:2030',
             'week' => 'required|integer|min:1|max:53',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'invoice_number' => 'nullable|string|max:255',
 
-            // Reimmersione Interna
-            'kg_micro_reimmersione_interna' => 'nullable|numeric|min:0',
-            'prezzo_micro_reimmersione_interna' => 'nullable|numeric|min:0',
-            'kg_piccola_reimmersione_interna' => 'nullable|numeric|min:0',
-            'prezzo_piccola_reimmersione_interna' => 'nullable|numeric|min:0',
+            // Internal Reimmersion
+            'kg_micro_internal_reimmersion' => 'nullable|numeric|min:0',
+            'price_micro_internal_reimmersion' => 'nullable|numeric|min:0',
+            'kg_small_internal_reimmersion' => 'nullable|numeric|min:0',
+            'price_small_internal_reimmersion' => 'nullable|numeric|min:0',
 
-            // Consumo Diretto
-            'kg_micro_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_micro_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_piccola_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_piccola_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_media_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_media_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_grande_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_grande_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_super_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_super_consumo_diretto' => 'nullable|numeric|min:0',
+            // Resale Reimmersion
+            'kg_micro_resale_reimmersion' => 'nullable|numeric|min:0',
+            'price_micro_resale_reimmersion' => 'nullable|numeric|min:0',
+            'kg_small_resale_reimmersion' => 'nullable|numeric|min:0',
+            'price_small_resale_reimmersion' => 'nullable|numeric|min:0',
+
+            // Direct Consumption
+            'kg_medium_consumption' => 'nullable|numeric|min:0',
+            'price_medium_consumption' => 'nullable|numeric|min:0',
+            'kg_large_consumption' => 'nullable|numeric|min:0',
+            'price_large_consumption' => 'nullable|numeric|min:0',
+            'kg_super_consumption' => 'nullable|numeric|min:0',
+            'price_super_consumption' => 'nullable|numeric|min:0',
+
+            // Calculations
+            'taxable_amount' => 'nullable|numeric|min:0',
+            'advance_paid' => 'nullable|numeric|min:0',
+            'withholding_tax' => 'nullable|numeric|min:0',
+            'profis' => 'nullable|numeric|min:0',
+            'bank_transfer' => 'nullable|numeric|min:0'
         ]);
 
         // Imposta valori di default per campi null
         foreach ($validated as $key => $value) {
-            if (is_null($value) && (str_contains($key, 'kg_') || str_contains($key, 'prezzo_'))) {
+            if (is_null($value) && (str_contains($key, 'kg_') || str_contains($key, 'price_') || in_array($key, ['taxable_amount', 'advance_paid', 'withholding_tax', 'profis', 'bank_transfer']))) {
                 $validated[$key] = 0;
             }
         }
+
+        // Imposta automaticamente company_id dall'utente corrente
+        $validated['company_id'] = auth()->user()->company_id;
 
         WeeklyRecord::create($validated);
 
@@ -66,7 +82,7 @@ class WeeklyRecordController extends Controller
 
     public function edit(WeeklyRecord $weeklyRecord)
     {
-        $members = Member::where('active', true)->orderBy('last_name')->orderBy('first_name')->get();
+        $members = Member::where('is_active', true)->orderBy('last_name')->orderBy('first_name')->get();
         return view('weekly-records.edit', compact('weeklyRecord', 'members'));
     }
 
@@ -76,29 +92,41 @@ class WeeklyRecordController extends Controller
             'member_id' => 'required|exists:members,id',
             'year' => 'required|integer|min:2020|max:2030',
             'week' => 'required|integer|min:1|max:53',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'invoice_number' => 'nullable|string|max:255',
 
-            // Reimmersione Interna
-            'kg_micro_reimmersione_interna' => 'nullable|numeric|min:0',
-            'prezzo_micro_reimmersione_interna' => 'nullable|numeric|min:0',
-            'kg_piccola_reimmersione_interna' => 'nullable|numeric|min:0',
-            'prezzo_piccola_reimmersione_interna' => 'nullable|numeric|min:0',
+            // Internal Reimmersion
+            'kg_micro_internal_reimmersion' => 'nullable|numeric|min:0',
+            'price_micro_internal_reimmersion' => 'nullable|numeric|min:0',
+            'kg_small_internal_reimmersion' => 'nullable|numeric|min:0',
+            'price_small_internal_reimmersion' => 'nullable|numeric|min:0',
 
-            // Consumo Diretto
-            'kg_micro_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_micro_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_piccola_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_piccola_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_media_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_media_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_grande_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_grande_consumo_diretto' => 'nullable|numeric|min:0',
-            'kg_super_consumo_diretto' => 'nullable|numeric|min:0',
-            'prezzo_super_consumo_diretto' => 'nullable|numeric|min:0',
+            // Resale Reimmersion
+            'kg_micro_resale_reimmersion' => 'nullable|numeric|min:0',
+            'price_micro_resale_reimmersion' => 'nullable|numeric|min:0',
+            'kg_small_resale_reimmersion' => 'nullable|numeric|min:0',
+            'price_small_resale_reimmersion' => 'nullable|numeric|min:0',
+
+            // Direct Consumption
+            'kg_medium_consumption' => 'nullable|numeric|min:0',
+            'price_medium_consumption' => 'nullable|numeric|min:0',
+            'kg_large_consumption' => 'nullable|numeric|min:0',
+            'price_large_consumption' => 'nullable|numeric|min:0',
+            'kg_super_consumption' => 'nullable|numeric|min:0',
+            'price_super_consumption' => 'nullable|numeric|min:0',
+
+            // Calculations
+            'taxable_amount' => 'nullable|numeric|min:0',
+            'advance_paid' => 'nullable|numeric|min:0',
+            'withholding_tax' => 'nullable|numeric|min:0',
+            'profis' => 'nullable|numeric|min:0',
+            'bank_transfer' => 'nullable|numeric|min:0'
         ]);
 
         // Imposta valori di default per campi null
         foreach ($validated as $key => $value) {
-            if (is_null($value) && (str_contains($key, 'kg_') || str_contains($key, 'prezzo_'))) {
+            if (is_null($value) && (str_contains($key, 'kg_') || str_contains($key, 'price_') || in_array($key, ['taxable_amount', 'advance_paid', 'withholding_tax', 'profis', 'bank_transfer']))) {
                 $validated[$key] = 0;
             }
         }

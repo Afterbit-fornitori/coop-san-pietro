@@ -28,6 +28,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Route pubblica per accettare inviti (non richiede autenticazione)
+Route::get('/invitations/accept/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
+
 // Dashboard principale - reindirizza basato sul ruolo
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -83,6 +86,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Dashboard Azienda
         Route::get('/dashboard', [CompanyDashboardController::class, 'index'])->name('dashboard');
 
+        // Gestione Aziende (San Pietro può gestire aziende child)
+        Route::resource('companies', CompanyController::class)->names([
+            'index' => 'companies.index',
+            'create' => 'companies.create',
+            'store' => 'companies.store',
+            'show' => 'companies.show',
+            'edit' => 'companies.edit',
+            'update' => 'companies.update',
+            'destroy' => 'companies.destroy',
+        ])->except(['destroy']); // San Pietro non può eliminare aziende, solo SUPER_ADMIN
+        Route::patch('/companies/{company}/toggle-status', [CompanyController::class, 'toggleStatus'])->name('companies.toggle-status');
+
+        // Gestione Utenti (della propria rete aziendale)
+        Route::resource('users', UserController::class)->names([
+            'index' => 'users.index',
+            'create' => 'users.create',
+            'store' => 'users.store',
+            'show' => 'users.show',
+            'edit' => 'users.edit',
+            'update' => 'users.update',
+            'destroy' => 'users.destroy',
+        ]);
+        Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+
         // Gestione Inviti (solo COMPANY_ADMIN)
         Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
         Route::get('/invitations/create', [InvitationController::class, 'create'])->name('invitations.create');
@@ -120,7 +147,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'destroy' => 'weekly-records.destroy',
         ]);
 
-        // Documenti di Trasporto
+        // Documenti di Trasporto (Alias per compatibilità)
+        Route::resource('documents', TransportDocumentController::class)->names([
+            'index' => 'documents.index',
+            'create' => 'documents.create',
+            'store' => 'documents.store',
+            'show' => 'documents.show',
+            'edit' => 'documents.edit',
+            'update' => 'documents.update',
+            'destroy' => 'documents.destroy',
+        ]);
+
+        // Documenti di Trasporto (Rotte originali)
         Route::resource('transport-documents', TransportDocumentController::class)->names([
             'index' => 'transport-documents.index',
             'create' => 'transport-documents.create',
@@ -151,6 +189,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'edit' => 'production-zones.edit',
             'update' => 'production-zones.update',
             'destroy' => 'production-zones.destroy',
+        ]);
+
+        // Gestione Produzioni
+        Route::resource('production', \App\Http\Controllers\ProductionController::class)->names([
+            'index' => 'production.index',
+            'create' => 'production.create',
+            'store' => 'production.store',
+            'show' => 'production.show',
+            'edit' => 'production.edit',
+            'update' => 'production.update',
+            'destroy' => 'production.destroy',
         ]);
     });
 });

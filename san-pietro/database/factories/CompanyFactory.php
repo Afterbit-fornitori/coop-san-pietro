@@ -13,7 +13,7 @@ class CompanyFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            // 'domain' è stato rimosso, quindi lo togliamo anche da qui.
+            'domain' => $this->faker->domainName(),
 
             // Usiamo i nuovi tipi definiti nella migrazione.
             'type' => $this->faker->randomElement(['main', 'invited']),
@@ -30,7 +30,7 @@ class CompanyFactory extends Factory
             'province' => $this->faker->lexify('??'),
             'zip_code' => $this->faker->postcode(),
             'is_active' => true,
-            'settings' => [
+            'impostazioni' => [
                 'allowed_child_companies' => 5,
                 'features' => ['members', 'ddt', 'production']
             ],

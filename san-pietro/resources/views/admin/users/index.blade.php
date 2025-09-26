@@ -3,8 +3,8 @@
 @section('content')
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold">Gestione Utenti</h2>
                     <a href="{{ route('admin.users.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -13,8 +13,8 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden">
-                        <thead class="bg-gray-100 dark:bg-gray-600">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-3 px-4 text-left">Nome</th>
                                 <th class="py-3 px-4 text-left">Email</th>
@@ -23,7 +23,7 @@
                                 <th class="py-3 px-4 text-left">Azioni</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-500">
+                        <tbody class="divide-y divide-gray-200">
                             @foreach($users as $user)
                             <tr>
                                 <td class="py-3 px-4">{{ $user->name }}</td>
@@ -48,10 +48,15 @@
                                             class="inline-block">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit"
-                                                class="{{ $user->is_active ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900' }}">
-                                                {{ $user->is_active ? 'Disattiva' : 'Attiva' }}
-                                            </button>
+                                            @if($user->is_active)
+                                                <button type="submit" class="text-yellow-600 hover:text-yellow-900">
+                                                    Disattiva
+                                                </button>
+                                            @else
+                                                <button type="submit" class="text-green-600 hover:text-green-900">
+                                                    Attiva
+                                                </button>
+                                            @endif
                                         </form>
 
                                         <form action="{{ route('admin.users.destroy', $user) }}"

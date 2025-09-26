@@ -48,9 +48,9 @@ class CompanySeeder extends Seeder
                 ['name' => $childData['name']],
                 [
                     'type'              => 'invited',
+                    'domain'            => strtolower(str_replace(['Cooperativa ', ' '], '', $childData['name'])) . ".test",
                     'is_active'         => true,
                     'parent_company_id' => $sanPietro->id,
-                    // 'active'            => true,
                     'impostazioni'      => ['features' => ['members', 'ddt', 'production']]
                 ]
             );

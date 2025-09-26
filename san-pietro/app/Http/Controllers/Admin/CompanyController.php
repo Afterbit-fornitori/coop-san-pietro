@@ -19,6 +19,7 @@ class CompanyController extends Controller
     {
         // Solo SUPER_ADMIN e COMPANY_ADMIN possono accedere al controllo aziende
         $this->middleware(['auth', 'role:SUPER_ADMIN|COMPANY_ADMIN']);
+        $this->authorizeResource(Company::class, 'company');
     }
 
     public function index()
@@ -47,14 +48,18 @@ class CompanyController extends Controller
 
     public function create()
     {
-        // Ottieni le aziende che possono essere parent (solo per SUPER_ADMIN)
         /** @var User $user */
         $user = auth()->user();
         $parentCompanies = [];
+
         if ($user->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN può vedere tutte le aziende come possibili parent
+            $parentCompanies = Company::whereIn('type', ['master', 'main'])->get();
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            // San Pietro (COMPANY_ADMIN principale) può creare aziende parent e child
             $parentCompanies = Company::whereIn('type', ['master', 'main'])->get();
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
-            // COMPANY_ADMIN può creare solo aziende figlie della propria
+            // Altri COMPANY_ADMIN possono creare solo aziende figlie della propria
             $parentCompanies = Company::where('id', $user->company_id)->get();
         }
 
@@ -66,9 +71,22 @@ class CompanyController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
+        // Definisci i tipi di azienda consentiti in base al ruolo
+        $allowedTypes = [];
+        if ($user->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN può creare tutti i tipi di aziende
+            $allowedTypes = ['master', 'main', 'invited'];
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            // San Pietro può creare solo aziende invited
+            $allowedTypes = ['invited'];
+        } else {
+            abort(403, 'Non hai i permessi per creare aziende');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|string|in:master,main,invited',
+            'domain' => 'required|string|unique:companies,domain',
+            'type' => 'required|string|in:' . implode(',', $allowedTypes),
             'parent_company_id' => 'nullable|exists:companies,id',
             'vat_number' => 'nullable|string|max:11|unique:companies',
             'tax_code' => 'nullable|string|max:16|unique:companies',
@@ -92,12 +110,16 @@ class CompanyController extends Controller
 
         try {
             // Logica di autorizzazione per la creazione
-            if ($user->hasRole('COMPANY_ADMIN') && $validated['type'] !== 'invited') {
-                throw new \Exception('COMPANY_ADMIN può creare solo aziende invitate');
-            }
-
-            if ($user->hasRole('COMPANY_ADMIN') && $validated['parent_company_id'] !== $user->company_id) {
-                throw new \Exception('COMPANY_ADMIN può creare aziende solo come figlie della propria');
+            if (!$user->hasRole('SUPER_ADMIN')) {
+                if ($user->hasRole('COMPANY_ADMIN') && !($user->company && $user->company->isMain())) {
+                    // Solo San Pietro (main company) può creare aziende invited
+                    if ($validated['type'] !== 'invited') {
+                        throw new \Exception('Solo San Pietro può creare aziende invited');
+                    }
+                    if ($validated['parent_company_id'] !== $user->company_id) {
+                        throw new \Exception('COMPANY_ADMIN può creare aziende solo come figlie della propria');
+                    }
+                }
             }
 
             // Crea l'azienda
@@ -147,7 +169,7 @@ class CompanyController extends Controller
     {
         /** @var User $user */
         $user = auth()->user();
-        
+
         $parentCompanies = [];
         if ($user->hasRole('SUPER_ADMIN')) {
             $parentCompanies = Company::whereIn('type', ['master', 'main'])
@@ -209,7 +231,21 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        $company->load(['users', 'parentCompany', 'childCompanies', 'members', 'productions']);
+        // Carica solo le relazioni che non hanno problemi con il tenant scope
+        $company->load(['users', 'parentCompany', 'childCompanies']);
+
+        // Per SUPER_ADMIN, carica anche members e productions senza applicare scope
+        $user = auth()->user();
+        if ($user->hasRole('SUPER_ADMIN')) {
+            $company->load([
+                'members' => function ($query) {
+                    $query->withoutGlobalScopes();
+                },
+                'productions' => function ($query) {
+                    $query->withoutGlobalScopes();
+                }
+            ]);
+        }
 
         return view('admin.companies.show', compact('company'));
     }
