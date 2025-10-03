@@ -47,6 +47,11 @@ class ProductionZoneController extends Controller
             ->with('success', 'Zona di produzione creata con successo.');
     }
 
+    public function show(ProductionZone $zone)
+    {
+        return view('production-zones.show', compact('zone'));
+    }
+
     public function edit(ProductionZone $zone)
     {
         return view('production-zones.edit', compact('zone'));

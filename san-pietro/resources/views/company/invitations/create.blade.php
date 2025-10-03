@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Crea un nuovo invito</h1>
 
-    <form action="{{ route('invitations.store') }}" method="POST">
+    <form action="{{ route('company.invitations.store') }}" method="POST">
         @csrf
 
         <div class="mb-3">

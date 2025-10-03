@@ -68,8 +68,8 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifica</a>
-                                <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="inline">
+                                <a href="{{ route('company.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifica</a>
+                                <form action="{{ route('company.users.toggle-status', $user) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="text-red-600 hover:text-red-900">
@@ -90,11 +90,11 @@
                 <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
                 <div class="space-y-2">
                     @if(auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company && auth()->user()->company->isMain())
-                    <a href="{{ route('admin.companies.create') }}" class="block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                    <a href="{{ route('company.companies.create') }}" class="block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
                         Nuova Azienda
                     </a>
                     @endif
-                    <a href="{{ route('admin.users.create') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+                    <a href="{{ route('company.users.create') }}" class="block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
                         Nuovo Utente
                     </a>
                     <a href="{{ route('members.create') }}" class="block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">

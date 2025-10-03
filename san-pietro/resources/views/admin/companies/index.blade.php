@@ -31,7 +31,7 @@
                                 <td class="py-3 px-4">{{ $company->name }}</td>
                                 <td class="py-3 px-4">{{ $company->domain }}</td>
                                 <td class="py-3 px-4">{{ ucfirst($company->type) }}</td>
-                                <td class="py-3 px-4">{{ $company->users->count() }}</td>
+                                <td class="py-3 px-4">{{ $company->users_count ?? 0 }}</td>
                                 <td class="py-3 px-4">
                                     @if($company->is_active)
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">

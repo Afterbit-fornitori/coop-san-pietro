@@ -26,10 +26,10 @@
                     @endif
 
                     @if(auth()->user()->hasRole('COMPANY_ADMIN'))
-                    <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                    <x-nav-link :href="route('company.companies.index')" :active="request()->routeIs('company.companies.*')">
                         {{ __('Aziende') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                    <x-nav-link :href="route('company.users.index')" :active="request()->routeIs('company.users.*')">
                         {{ __('Utenti') }}
                     </x-nav-link>
                     <x-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
@@ -49,6 +49,15 @@
                     </x-nav-link>
                     <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
                         {{ __('Clienti') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                        {{ __('Prodotti') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('production-zones.index')" :active="request()->routeIs('production-zones.*')">
+                        {{ __('Zone Produzione') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('loading-unloading.index')" :active="request()->routeIs('loading-unloading.*')">
+                        {{ __('Carico/Scarico') }}
                     </x-nav-link>
                     @endif
                 </div>
@@ -134,6 +143,15 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')">
                 {{ __('Clienti') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                {{ __('Prodotti') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('production-zones.index')" :active="request()->routeIs('production-zones.*')">
+                {{ __('Zone Produzione') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('loading-unloading.index')" :active="request()->routeIs('loading-unloading.*')">
+                {{ __('Carico/Scarico') }}
             </x-responsive-nav-link>
             @endif
         </div>

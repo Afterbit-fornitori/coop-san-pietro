@@ -27,9 +27,9 @@ class TransportDocumentController extends Controller
 
     public function create()
     {
-        $clients = Client::orderBy('ragione_sociale')->get();
-        $members = Member::orderBy('cognome')->get();
-        $productionZones = ProductionZone::where('attiva', true)->orderBy('nome')->get();
+        $clients = Client::orderBy('business_name')->get();
+        $members = Member::orderBy('last_name')->orderBy('first_name')->get();
+        $productionZones = ProductionZone::where('is_active', true)->orderBy('nome')->get();
 
         return view('transport-documents.create', compact('clients', 'members', 'productionZones'));
     }
@@ -74,9 +74,9 @@ class TransportDocumentController extends Controller
 
     public function edit(TransportDocument $transportDocument)
     {
-        $clients = Client::orderBy('ragione_sociale')->get();
-        $members = Member::orderBy('cognome')->get();
-        $productionZones = ProductionZone::where('attiva', true)->orderBy('nome')->get();
+        $clients = Client::orderBy('business_name')->get();
+        $members = Member::orderBy('last_name')->orderBy('first_name')->get();
+        $productionZones = ProductionZone::where('is_active', true)->orderBy('nome')->get();
 
         return view('transport-documents.edit', compact('transportDocument', 'clients', 'members', 'productionZones'));
     }

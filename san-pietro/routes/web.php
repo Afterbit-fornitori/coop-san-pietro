@@ -46,9 +46,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ==============================================
-    // AREA AMMINISTRATIVA - SOLO SUPER_ADMIN
+    // AREA AMMINISTRATIVA - SUPER_ADMIN e COMPANY_ADMIN (San Pietro)
     // ==============================================
-    Route::prefix('admin')->name('admin.')->middleware(['role:SUPER_ADMIN'])->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(['role:SUPER_ADMIN|COMPANY_ADMIN'])->group(function () {
 
         // Dashboard Admin
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -200,6 +200,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'edit' => 'production.edit',
             'update' => 'production.update',
             'destroy' => 'production.destroy',
+        ]);
+
+        // Prodotti
+        Route::resource('products', \App\Http\Controllers\ProductController::class)->names([
+            'index' => 'products.index',
+            'create' => 'products.create',
+            'store' => 'products.store',
+            'show' => 'products.show',
+            'edit' => 'products.edit',
+            'update' => 'products.update',
+            'destroy' => 'products.destroy',
+        ]);
+
+        // Registro Carico/Scarico
+        Route::resource('loading-unloading', \App\Http\Controllers\LoadingUnloadingRegisterController::class)->names([
+            'index' => 'loading-unloading.index',
+            'create' => 'loading-unloading.create',
+            'store' => 'loading-unloading.store',
+            'show' => 'loading-unloading.show',
+            'edit' => 'loading-unloading.edit',
+            'update' => 'loading-unloading.update',
+            'destroy' => 'loading-unloading.destroy',
         ]);
     });
 });

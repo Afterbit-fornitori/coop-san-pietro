@@ -144,10 +144,10 @@ class Company extends Tenant
         return $this->type === 'master';
     }
 
-    // Verifica se è l'azienda principale
+    // Verifica se è l'azienda principale (master o main)
     public function isMain(): bool
     {
-        return $this->type === 'main';
+        return in_array($this->type, ['master', 'main']);
     }
 
     // Verifica se è un'azienda invitata

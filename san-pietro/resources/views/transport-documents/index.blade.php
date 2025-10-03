@@ -29,7 +29,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-700 divide-y divide-gray-200 dark:divide-gray-600">
-                        @foreach($documents as $document)
+                        @forelse($transportDocuments as $document)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium">{{ $document->title }}</div>

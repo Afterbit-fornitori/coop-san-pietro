@@ -14,7 +14,7 @@ class ClientController extends Controller
     }
     public function index()
     {
-        $clients = Client::orderBy('ragione_sociale')->paginate(15);
+        $clients = Client::orderBy('business_name')->paginate(15);
         return view('clients.index', compact('clients'));
     }
 
@@ -26,18 +26,17 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ragione_sociale' => 'required|string|max:255',
-            'indirizzo' => 'required|string|max:255',
-            'cap' => 'required|string|max:10',
-            'comune' => 'required|string|max:255',
-            'provincia' => 'required|string|max:5',
-            'nazione' => 'required|string|max:100|default:Italia',
-            'partita_iva' => 'nullable|string|max:20',
-            'codice_fiscale' => 'nullable|string|max:16',
-            'telefono' => 'nullable|string|max:20',
+            'business_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:10',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:2',
+            'vat_number' => 'nullable|string|max:11',
+            'tax_code' => 'nullable|string|max:16',
+            'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'pec' => 'nullable|email|max:255',
-            'codice_sdi' => 'nullable|string|max:10',
+            'sdi_code' => 'nullable|string|max:7',
             'note' => 'nullable|string',
             'is_active' => 'nullable|boolean',
         ]);
@@ -65,18 +64,17 @@ class ClientController extends Controller
     public function update(Request $request, Client $client)
     {
         $validated = $request->validate([
-            'ragione_sociale' => 'required|string|max:255',
-            'indirizzo' => 'required|string|max:255',
-            'cap' => 'required|string|max:10',
-            'comune' => 'required|string|max:255',
-            'provincia' => 'required|string|max:5',
-            'nazione' => 'required|string|max:100',
-            'partita_iva' => 'nullable|string|max:20',
-            'codice_fiscale' => 'nullable|string|max:16',
-            'telefono' => 'nullable|string|max:20',
+            'business_name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:10',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:2',
+            'vat_number' => 'nullable|string|max:11',
+            'tax_code' => 'nullable|string|max:16',
+            'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'pec' => 'nullable|email|max:255',
-            'codice_sdi' => 'nullable|string|max:10',
+            'sdi_code' => 'nullable|string|max:7',
             'note' => 'nullable|string',
             'is_active' => 'nullable|boolean',
         ]);

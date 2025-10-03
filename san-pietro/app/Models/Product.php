@@ -58,7 +58,7 @@ class Product extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('attivo', true);
+        return $query->where('is_active', true);
     }
 
     public function scopeBySpecie($query, $specie)

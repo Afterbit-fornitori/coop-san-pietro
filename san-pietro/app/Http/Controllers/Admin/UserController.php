@@ -15,6 +15,14 @@ class UserController extends Controller
         $this->authorizeResource(User::class, 'user');
     }
 
+    /**
+     * Helper per ottenere il prefisso della route in base al ruolo
+     */
+    private function getRoutePrefix(): string
+    {
+        return auth()->user()->hasRole('SUPER_ADMIN') ? 'admin' : 'company';
+    }
+
     public function index(Request $request)
     {
         $query = User::query()->with(['company', 'roles']);
@@ -42,6 +50,7 @@ class UserController extends Controller
         /** @var User $currentUser */
         $currentUser = auth()->user();
 
+        // Determina le aziende accessibili
         if ($currentUser->hasRole('SUPER_ADMIN')) {
             $companies = Company::all();
         } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company) {
@@ -51,7 +60,18 @@ class UserController extends Controller
             $companies = collect([]);
         }
 
-        $roles = Role::all();
+        // Determina i ruoli assegnabili in base al ruolo dell'utente corrente
+        if ($currentUser->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN può assegnare qualsiasi ruolo
+            $roles = Role::all();
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN')) {
+            // COMPANY_ADMIN può assegnare solo COMPANY_ADMIN e COMPANY_USER
+            $roles = Role::whereIn('name', ['COMPANY_ADMIN', 'COMPANY_USER'])->get();
+        } else {
+            // Altri ruoli non possono creare utenti
+            $roles = collect([]);
+        }
+
         return view('admin.users.create', compact('companies', 'roles'));
     }
 
@@ -69,10 +89,20 @@ class UserController extends Controller
         ]);
 
         // Verifica che l'utente possa creare utenti per questa azienda
-        if (!$currentUser->hasRole('SUPER_ADMIN')) {
+        if (!$currentUser->hasRole('SUPER_ADMIN') && !$currentUser->hasRole('COMPANY_ADMIN')) {
             if (!$currentUser->canAccessCompany($validated['company_id'])) {
                 abort(403, 'Non hai i permessi per creare utenti in questa azienda.');
             }
+        }
+
+        // Verifica che COMPANY_ADMIN non possa assegnare SUPER_ADMIN
+        if ($currentUser->hasRole('COMPANY_ADMIN') && $validated['role'] === 'SUPER_ADMIN') {
+            abort(403, 'Non hai i permessi per assegnare il ruolo di Super Admin.');
+        }
+
+        // Verifica che COMPANY_ADMIN possa assegnare solo COMPANY_ADMIN e COMPANY_USER
+        if ($currentUser->hasRole('COMPANY_ADMIN') && !in_array($validated['role'], ['COMPANY_ADMIN', 'COMPANY_USER'])) {
+            abort(403, 'Puoi assegnare solo i ruoli Company Admin o Company User.');
         }
 
         $user = User::create([
@@ -85,7 +115,7 @@ class UserController extends Controller
 
         $user->assignRole($validated['role']);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route($this->getRoutePrefix() . '.users.index')
             ->with('success', 'Utente creato con successo.');
     }
 
@@ -94,6 +124,7 @@ class UserController extends Controller
         /** @var User $currentUser */
         $currentUser = auth()->user();
 
+        // Determina le aziende accessibili
         if ($currentUser->hasRole('SUPER_ADMIN')) {
             $companies = Company::all();
         } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company) {
@@ -103,12 +134,26 @@ class UserController extends Controller
             $companies = collect([]);
         }
 
-        $roles = Role::all();
+        // Determina i ruoli assegnabili in base al ruolo dell'utente corrente
+        if ($currentUser->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN può assegnare qualsiasi ruolo
+            $roles = Role::all();
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN')) {
+            // COMPANY_ADMIN può assegnare solo COMPANY_ADMIN e COMPANY_USER
+            $roles = Role::whereIn('name', ['COMPANY_ADMIN', 'COMPANY_USER'])->get();
+        } else {
+            // Altri ruoli non possono modificare ruoli
+            $roles = collect([]);
+        }
+
         return view('admin.users.edit', compact('user', 'companies', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
+        /** @var User $currentUser */
+        $currentUser = $request->user();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
@@ -116,6 +161,16 @@ class UserController extends Controller
             'company_id' => 'required|exists:companies,id',
             'role' => 'required|exists:roles,name'
         ]);
+
+        // Verifica che COMPANY_ADMIN non possa assegnare SUPER_ADMIN
+        if ($currentUser->hasRole('COMPANY_ADMIN') && $validated['role'] === 'SUPER_ADMIN') {
+            abort(403, 'Non hai i permessi per assegnare il ruolo di Super Admin.');
+        }
+
+        // Verifica che COMPANY_ADMIN possa assegnare solo COMPANY_ADMIN e COMPANY_USER
+        if ($currentUser->hasRole('COMPANY_ADMIN') && !in_array($validated['role'], ['COMPANY_ADMIN', 'COMPANY_USER'])) {
+            abort(403, 'Puoi assegnare solo i ruoli Company Admin o Company User.');
+        }
 
         $data = [
             'name' => $validated['name'],
@@ -135,7 +190,7 @@ class UserController extends Controller
             $user->assignRole($validated['role']);
         }
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route($this->getRoutePrefix() . '.users.index')
             ->with('success', 'Utente aggiornato con successo.');
     }
 
@@ -143,7 +198,7 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('admin.users.index')
+        return redirect()->route($this->getRoutePrefix() . '.users.index')
             ->with('success', 'Utente eliminato con successo.');
     }
 

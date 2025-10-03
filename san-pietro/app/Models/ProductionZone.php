@@ -58,7 +58,7 @@ class ProductionZone extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('attiva', true);
+        return $query->where('is_active', true);
     }
 
     public function scopeDeclassified($query)
@@ -69,6 +69,6 @@ class ProductionZone extends Model
     // Verifica se la zona può essere usata per prodotti da consumo
     public function canProduceForConsumption(): bool
     {
-        return $this->attiva && !$this->declassificazione_temporanea;
+        return $this->is_active && !$this->declassificazione_temporanea;
     }
 }

@@ -22,7 +22,17 @@ class WeeklyRecordController extends Controller
 
     public function create()
     {
-        $members = Member::where('is_active', true)->orderBy('last_name')->orderBy('first_name')->get();
+        // BelongsToTenant già filtra per company_id automaticamente
+        $members = Member::where('is_active', true)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get();
+
+        // Debug: se vuoto, prova senza filtro is_active
+        if ($members->isEmpty()) {
+            $members = Member::orderBy('last_name')->orderBy('first_name')->get();
+        }
+
         return view('weekly-records.create', compact('members'));
     }
 

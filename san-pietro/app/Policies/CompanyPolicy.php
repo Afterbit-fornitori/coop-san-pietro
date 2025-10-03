@@ -14,7 +14,7 @@ class CompanyPolicy
 
     public function view(User $user, Company $company): bool
     {
-        if ($user->hasRole('SUPER_ADMIN' || 'COMPANY_ADMIN')) {
+        if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
@@ -30,12 +30,22 @@ class CompanyPolicy
 
     public function create(User $user): bool
     {
-        // SUPER_ADMIN può sempre creare aziende
+        // SUPER_ADMIN può sempre creare aziende (master, main, invited)
         if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
-        return $user->hasPermissionTo('create companies');
+        // COMPANY_ADMIN di San Pietro (PROPRIETARIO - main) può creare qualsiasi tipo di azienda
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            return true;
+        }
+
+        // Altri COMPANY_ADMIN possono creare aziende invited se hanno il permesso
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            return $user->hasPermissionTo('create companies');
+        }
+
+        return false;
     }
 
     public function update(User $user, Company $company): bool

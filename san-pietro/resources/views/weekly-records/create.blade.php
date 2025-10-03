@@ -54,6 +54,26 @@
                                required>
                     </div>
                 </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium">Data Inizio *</label>
+                        <input type="date" id="start_date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               required>
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium">Data Fine *</label>
+                        <input type="date" id="end_date" name="end_date" value="{{ old('end_date', date('Y-m-d')) }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               required>
+                    </div>
+                    <div>
+                        <label for="invoice_number" class="block text-sm font-medium">Numero Fattura</label>
+                        <input type="text" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                </div>
             </div>
 
             <!-- Reimmersione Interna -->
