@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -27,7 +28,14 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'codice' => 'required|string|max:255',
+            'codice' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('products')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )
+            ],
             'nome_scientifico' => 'required|string|max:255',
             'nome_commerciale' => 'required|string|max:255',
             'specie' => 'required|in:VONGOLE,COZZE,OSTRICHE,ALTRO',
@@ -60,7 +68,14 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'codice' => 'required|string|max:255',
+            'codice' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('products')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )->ignore($product->id)
+            ],
             'nome_scientifico' => 'required|string|max:255',
             'nome_commerciale' => 'required|string|max:255',
             'specie' => 'required|in:VONGOLE,COZZE,OSTRICHE,ALTRO',

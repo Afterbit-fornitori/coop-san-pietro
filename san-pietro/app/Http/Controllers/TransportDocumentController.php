@@ -7,12 +7,17 @@ use App\Models\TransportDocument;
 use App\Models\Client;
 use App\Models\Member;
 use App\Models\ProductionZone;
+use App\Services\TransportDocumentPdfService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TransportDocumentController extends Controller
 {
-    public function __construct()
+    protected $pdfService;
+
+    public function __construct(TransportDocumentPdfService $pdfService)
     {
+        $this->pdfService = $pdfService;
         $this->authorizeResource(TransportDocument::class, 'transport_document');
     }
 
@@ -50,17 +55,24 @@ class TransportDocumentController extends Controller
             'annotazioni' => 'nullable|string',
         ]);
 
-        // Auto-generate numero progressivo per anno corrente
-        $year = date('Y', strtotime($validated['data_documento']));
-        $lastNumber = TransportDocument::where('serie', $validated['serie'])
-            ->where('anno', $year)
-            ->max('numero') ?? 0;
+        // Transaction con lock per numerazione progressiva
+        $transportDocument = DB::transaction(function () use ($validated) {
+            $year = date('Y', strtotime($validated['data_documento']));
+            $companyId = auth()->user()->company_id;
 
-        $validated['numero'] = $lastNumber + 1;
-        $validated['anno'] = $year;
-        $validated['company_id'] = auth()->user()->company_id;
+            // Lock per evitare race condition sulla numerazione
+            $lastNumber = TransportDocument::where('company_id', $companyId)
+                ->where('serie', $validated['serie'])
+                ->where('anno', $year)
+                ->lockForUpdate()
+                ->max('numero') ?? 0;
 
-        $transportDocument = TransportDocument::create($validated);
+            $validated['numero'] = $lastNumber + 1;
+            $validated['anno'] = $year;
+            $validated['company_id'] = $companyId;
+
+            return TransportDocument::create($validated);
+        });
 
         return redirect()->route('transport-documents.index')
             ->with('success', 'Documento di trasporto creato con successo.');
@@ -108,5 +120,25 @@ class TransportDocumentController extends Controller
 
         return redirect()->route('transport-documents.index')
             ->with('success', 'Documento di trasporto eliminato con successo.');
+    }
+
+    /**
+     * Scarica il PDF del documento di trasporto
+     */
+    public function downloadPdf(TransportDocument $transportDocument)
+    {
+        $this->authorize('view', $transportDocument);
+
+        return $this->pdfService->downloadPdf($transportDocument);
+    }
+
+    /**
+     * Visualizza il PDF del documento di trasporto inline
+     */
+    public function viewPdf(TransportDocument $transportDocument)
+    {
+        $this->authorize('view', $transportDocument);
+
+        return $this->pdfService->streamPdf($transportDocument);
     }
 }

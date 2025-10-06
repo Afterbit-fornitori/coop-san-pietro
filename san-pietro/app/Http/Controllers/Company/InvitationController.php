@@ -76,7 +76,7 @@ class InvitationController extends Controller
         // Invia email di invito
         Mail::to($validated['email'])->send(new CompanyInvitationMail($invitation));
 
-        return redirect()->route('invitations.index')
+        return redirect()->route('company.invitations.index')
             ->with('success', "Invito inviato a {$validated['company_name']} ({$validated['email']}).");
     }
 
@@ -108,7 +108,7 @@ class InvitationController extends Controller
         $companyName = $invitation->company_name;
         $invitation->delete();
 
-        return redirect()->route('invitations.index')
+        return redirect()->route('company.invitations.index')
             ->with('success', "Invito per {$companyName} eliminato con successo.");
     }
 
@@ -124,8 +124,10 @@ class InvitationController extends Controller
                 ->withErrors(['error' => 'Invito non valido o scaduto.']);
         }
 
-        // Reindirizza alla pagina di registrazione con i dati dell'invito
-        return redirect()->route('register')
-            ->with('invitation', $invitation);
+        // Aggiorna status a "viewed" quando l'invito viene visualizzato
+        $invitation->update(['status' => 'viewed']);
+
+        // Reindirizza alla pagina di registrazione con il token nell'URL
+        return redirect()->route('register', ['invitation_token' => $token]);
     }
 }

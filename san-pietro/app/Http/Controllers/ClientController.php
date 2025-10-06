@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -12,6 +13,7 @@ class ClientController extends Controller
     {
         $this->authorizeResource(Client::class, 'client');
     }
+
     public function index()
     {
         $clients = Client::orderBy('business_name')->paginate(15);
@@ -31,8 +33,22 @@ class ClientController extends Controller
             'postal_code' => 'required|string|max:10',
             'city' => 'required|string|max:255',
             'province' => 'required|string|max:2',
-            'vat_number' => 'nullable|string|max:11',
-            'tax_code' => 'nullable|string|max:16',
+            'vat_number' => [
+                'nullable',
+                'string',
+                'max:11',
+                Rule::unique('clients')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )
+            ],
+            'tax_code' => [
+                'nullable',
+                'string',
+                'max:16',
+                Rule::unique('clients')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )
+            ],
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'pec' => 'nullable|email|max:255',
@@ -69,8 +85,22 @@ class ClientController extends Controller
             'postal_code' => 'required|string|max:10',
             'city' => 'required|string|max:255',
             'province' => 'required|string|max:2',
-            'vat_number' => 'nullable|string|max:11',
-            'tax_code' => 'nullable|string|max:16',
+            'vat_number' => [
+                'nullable',
+                'string',
+                'max:11',
+                Rule::unique('clients')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )->ignore($client->id)
+            ],
+            'tax_code' => [
+                'nullable',
+                'string',
+                'max:16',
+                Rule::unique('clients')->where(fn($q) =>
+                    $q->where('company_id', auth()->user()->company_id)
+                )->ignore($client->id)
+            ],
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'pec' => 'nullable|email|max:255',

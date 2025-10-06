@@ -8,6 +8,7 @@ use App\Http\Controllers\Company\DashboardController as CompanyDashboardControll
 use App\Http\Controllers\Company\InvitationController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\TransportDocumentController;
+use App\Http\Controllers\TransportDocumentItemController;
 use App\Http\Controllers\WeeklyRecordController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductionZoneController;
@@ -168,6 +169,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'update' => 'transport-documents.update',
             'destroy' => 'transport-documents.destroy',
         ]);
+
+        // Route PDF per Documenti di Trasporto
+        Route::get('/transport-documents/{transport_document}/pdf', [TransportDocumentController::class, 'viewPdf'])->name('transport-documents.pdf.view');
+        Route::get('/transport-documents/{transport_document}/pdf/download', [TransportDocumentController::class, 'downloadPdf'])->name('transport-documents.pdf.download');
+
+        // Gestione Items (Prodotti) di Documenti di Trasporto (AJAX)
+        Route::post('/transport-document-items', [TransportDocumentItemController::class, 'store'])->name('transport-document-items.store');
+        Route::delete('/transport-document-items/{transport_document_item}', [TransportDocumentItemController::class, 'destroy'])->name('transport-document-items.destroy');
 
         // Clienti
         Route::resource('clients', ClientController::class)->names([

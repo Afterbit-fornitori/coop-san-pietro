@@ -14,17 +14,17 @@ class CompanyInvitation extends Model
         'inviter_company_id',
         'email',
         'token',
-        'nome_azienda',
-        'tipo_attivita',
-        'settore',
-        'permessi',
-        'scade_il',
-        'stato'
+        'company_name',
+        'business_type',
+        'sector',
+        'permissions',
+        'expires_at',
+        'status'
     ];
 
     protected $casts = [
-        'permessi' => 'array',
-        'scade_il' => 'datetime',
+        'permissions' => 'array',
+        'expires_at' => 'datetime',
     ];
 
     public function inviterCompany(): BelongsTo
@@ -34,11 +34,11 @@ class CompanyInvitation extends Model
 
     public function isExpired(): bool
     {
-        return $this->scade_il->isPast();
+        return $this->expires_at->isPast();
     }
 
     public function isPending(): bool
     {
-        return $this->stato === 'pending';
+        return $this->status === 'pending';
     }
 }

@@ -1,0 +1,124 @@
+﻿
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <meta charset='utf-8'>
+                    <title>Template DDT Completo</title>
+                    <style>
+                        @page { size: A4; margin: 1.5cm; }
+                        body { font-family: Calibri, sans-serif; font-size: 10pt; }
+                        p, li, div { margin: 0; padding: 0; line-height: 1.5; }
+                        .section { margin-bottom: 12px; }
+                        .heading-main { font-size: 11pt; font-weight: bold; text-align: center; margin-bottom: 10px; }
+                        .field-label { font-weight: bold; }
+                        .checkbox { display: inline-block; width: 10px; height: 10px; border: 1px solid #000; vertical-align: middle; margin-right: 4px;}
+                        .dots { border-bottom: 1px dotted #000; }
+                        table { border-collapse: collapse; width: 100%; margin-top: 5px; margin-bottom: 5px; }
+                        th, td { border: 1px solid black; padding: 4px; text-align: left; vertical-align: top; }
+                        th { font-weight: bold; text-align: center; }
+                        .no-border-table td { border: none; padding: 1px 0; }
+                        .footer-table { width: 100%; margin-top: 20px; }
+                        .footer-table td { border: 1px solid #000; vertical-align: top; height: 50px; padding: 5px; }
+                        .full-width-dots { border-bottom: 1px dotted #000; width: 100%; display: inline-block; }
+                    </style>
+                </head>
+                <body>
+                    <!-- PRIMA PARTE: DOCUMENTAZIONE DI REGISTRAZIONE -->
+                    <div class="section">
+                        <p class="heading-main">DOCUMENTAZIONE DI REGISTRAZIONE PER IL TRASFERIMENTO DEI LOTTI DI MOLLUSCHI BIVALVI/MITILI</p>
+                        <p style="text-align: right;">Serie ${serie} &nbsp;&nbsp;&nbsp; ${anno} &nbsp;&nbsp;&nbsp; N ${numero}</p>
+                    </div>
+
+                    <div class="section">
+                        <p style="font-weight: bold; text-align: center; margin-bottom: 5px;">ZONA DI PRODUZIONE E ORIGINE DEI MOLLUSCHI</p>
+                        <p>
+                            <span class="checkbox"></span> Schiuditoio &nbsp;&nbsp;
+                            <span class="checkbox"></span> Banchi naturali &nbsp;&nbsp;
+                            <span class="checkbox"></span> Banchi naturali in zone non classificate &nbsp;&nbsp;
+                            <span class="checkbox"></span> Area in concessione
+                        </p>
+                        <p>Data di raccolta: <span class="field-label">${data_raccolta}</span></p>
+                        <p>Stato sanitario della zona di produzione: <span class="field-label">${stato_sanitario}</span></p>
+                        <p>Declassificazione temporanea: <span class="checkbox"></span> SI &nbsp;&nbsp; <span class="checkbox"></span> NO</p>
+                        <p>Ubicazione della zona di produzione: <span class="field-label">${zona_produzione}</span></p>
+                        <p>Nome e ragione sociale del produttore/raccoglitore/capobarca: <span class="field-label">${mittente_indirizzo}</span></p>
+                        <p>Dati fiscali: <span class="field-label">${mittente_piva_cf}</span></p>
+                        <p>Contatti: <span class="field-label">${mittente_pec}, ${mittente_contatti}</span></p>
+                    </div>
+
+                    <div class="section">
+                        <p style="font-weight: bold;">Provenienza dei molluschi:</p>
+                        <p><span class="checkbox"></span> DA ZONA DI STABULAZIONE</p>
+                        <p>Ubicazione della zona di stabulazione<span class="dots">...................................................................................................................................</span></p>
+                        <p>Durata della stabulazione (in giorni)<span class="dots">...................</span>Data ingresso<span class="dots">...................</span>Data Uscita<span class="dots">...................</span></p>
+                        <p><span class="checkbox"></span> DA CENTRO DI DEPURAZIONE</p>
+                        <p>Indirizzo del centro di depurazione<span class="dots">.......................................................................................................................................</span></p>
+                        <p>Durata della depurazione (in giorni)<span class="dots">...................</span>Data ingresso<span class="dots">...................</span>Data Uscita<span class="dots">...................</span></p>
+                        <p><span class="checkbox"></span> DA CENTRO DI SPEDIZIONE</p>
+                        <p>Indirizzo del centro di spedizione<span class="dots">........................................................................................................................................</span></p>
+                        <p>Data ingresso<span class="dots">................................</span>Data Uscita<span class="dots">................................</span></p>
+                    </div>
+
+                    <div class="section">
+                        <table>
+                            <thead><tr><th>SPECIE</th><th>N° DEI COLLI</th><th>PESO IN KG</th></tr></thead>
+                            <tbody>
+                                <tr><td>${specie1}</td><td style="text-align:center;">${colli1}</td><td style="text-align:center;">${kg1}</td></tr>
+                                <tr><td>${specie2}</td><td style="text-align:center;">${colli2}</td><td style="text-align:center;">${kg2}</td></tr>
+                                <tr><td>${specie3}</td><td style="text-align:center;">${colli3}</td><td style="text-align:center;">${kg3}</td></tr>
+                                <tr><td>${specie4}</td><td style="text-align:center;">${colli4}</td><td style="text-align:center;">${kg4}</td></tr>
+                                <tr><td>${specie5}</td><td style="text-align:center;">${colli5}</td><td style="text-align:center;">${kg5}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section">
+                        <p style="font-weight: bold;">DESTINAZIONE DEL NOVELLAME</p>
+                        <p><span class="checkbox"></span> ZONA DI PRODUZIONE</p>
+                        <p><span class="checkbox"></span> ZONA DI STABULAZIONE (indicare l’ ubicazione)<span class="dots">................................................................................</span></p>
+                        <p><span class="checkbox"></span> CENTRO DI DEPURAZIONE (riconosciuto col numero)<span class="dots">................</span><span class="field-label">${cliente_n_cdm}</span><span class="dots">................</span></p>
+                        <p><span class="checkbox"></span> CENTRO DI SPEDIZIONE (riconosciuto col numero)<span class="dots">...................................................................................</span></p>
+                        <p><span class="checkbox"></span> CENTRO DI TRASFORMAZIONE (riconosciuto col numero)<span class="dots">......................................................................</span></p>
+                    </div>
+                    
+                    <div class="section">
+                        <p>Nome e denominazione: <span class="field-label">${cliente_nome}</span>, <span class="field-label">${cliente_piva_cf}</span>, <span class="field-label">${cliente_telefono}</span></p>
+                        <p>Eventuale identificazione del vettore<span class="dots">.................................................................................................................................</span></p>
+                        <p>Punto di sbarco<span class="dots">...............................................................................................................................................................</span></p>
+                        <p>Data <span class="field-label">${data_documento}</span> <span style="float: right;">Firma ......................................</span></p>
+                        <p style="font-size: 8pt; margin-top: 5px;">Nota: in caso di invio di MBV con differente destinazione non può essere usato un unico documento</p>
+                    </div>
+
+                    <!-- SECONDA PARTE: DOCUMENTO DI TRASPORTO -->
+                    <div class="section" style="page-break-before: always;">
+                        <p class="heading-main" style="margin-top: 30px;">DOCUMENTO DI TRASPORTO</p>
+                        
+                        <table>
+                            <thead><tr><th>DESCRIZIONE DEI BENI</th><th>Quantità kg</th><th>Colli</th><th>Euro al kg</th></tr></thead>
+                            <tbody>
+                                <tr><td>${prodotto1_desc}</td><td style="text-align:center;">${prodotto1_kg}</td><td style="text-align:center;">${prodotto1_colli}</td><td style="text-align:center;">${prodotto1_prezzo}</td></tr>
+                                <tr><td>${prodotto2_desc}</td><td style="text-align:center;">${prodotto2_kg}</td><td style="text-align:center;">${prodotto2_colli}</td><td style="text-align:center;">${prodotto2_prezzo}</td></tr>
+                                <tr><td>${prodotto3_desc}</td><td style="text-align:center;">${prodotto3_kg}</td><td style="text-align:center;">${prodotto3_colli}</td><td style="text-align:center;">${prodotto3_prezzo}</td></tr>
+                                <tr><td>${prodotto4_desc}</td><td style="text-align:center;">${prodotto4_kg}</td><td style="text-align:center;">${prodotto4_colli}</td><td style="text-align:center;">${prodotto4_prezzo}</td></tr>
+                                <tr><td>${prodotto5_desc}</td><td style="text-align:center;">${prodotto5_kg}</td><td style="text-align:center;">${prodotto5_colli}</td><td style="text-align:center;">${prodotto5_prezzo}</td></tr>
+                                <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+                                <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+                                <tr><td>&nbsp;</td><td></td><td></td><td></td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <p style="margin-top: 10px;"><span class="field-label">TRASPORTO A MEZZO:</span> MITTENTE</p>
+                        <p><span class="field-label">DATA E ORA RITIRO:</span></p>
+                        <p><span class="field-label">VETTORE:</span></p>
+                        <p><span class="field-label">ANNOTAZIONI:</span></p>
+                        
+                        <table class="footer-table">
+                            <tr>
+                                <td style="width: 33.3%;"><p>FIRMA MITTENTE</p></td>
+                                <td style="width: 33.3%;"><p>FIRMA VETTORE</p></td>
+                                <td style="width: 33.3%;"><p>FIRMA DESTINATARIO</p></td>
+                            </tr>
+                        </table>
+                    </div>
+                </body>
+                </html>
+            

@@ -2,6 +2,21 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+        <!-- Invitation Token (hidden) -->
+        @if(request()->query('invitation_token'))
+            <input type="hidden" name="invitation_token" value="{{ request()->query('invitation_token') }}">
+        @endif
+
+        <!-- Invito Info Banner -->
+        @if(isset($invitation) && $invitation)
+            <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700">
+                <p class="font-semibold mb-2">✉️ Stai accettando un invito</p>
+                <p class="text-sm">Azienda: <strong>{{ $invitation->company_name }}</strong></p>
+                <p class="text-sm">Email invito: <strong>{{ $invitation->email }}</strong></p>
+                <p class="text-sm text-gray-600 mt-2">Completa la registrazione per creare il tuo account amministratore.</p>
+            </div>
+        @endif
+
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -12,8 +27,14 @@
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email"
+                :value="old('email', $invitation->email ?? '')"
+                :readonly="isset($invitation) && $invitation"
+                required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            @if(isset($invitation) && $invitation)
+                <p class="mt-1 text-sm text-gray-500">Email pre-compilata dall'invito (non modificabile)</p>
+            @endif
         </div>
 
         <!-- Password -->

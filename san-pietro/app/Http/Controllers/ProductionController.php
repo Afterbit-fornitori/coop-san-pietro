@@ -12,6 +12,11 @@ use Illuminate\Http\Request;
 
 class ProductionController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Production::class, 'production');
+    }
+
     public function index(Request $request)
     {
         $query = Production::with(['productionZone', 'member']);
@@ -45,7 +50,11 @@ class ProductionController extends Controller
     {
         $productionZones = ProductionZone::where('is_active', true)->get();
         $members = Member::where('is_active', true)->get();
-        $companies = Company::all();
+
+        // Solo SUPER_ADMIN può vedere tutte le companies
+        $companies = auth()->user()->isSuperAdmin()
+            ? Company::all()
+            : auth()->user()->getAccessibleCompanies();
 
         return view('productions.create', compact('productionZones', 'members', 'companies'));
     }

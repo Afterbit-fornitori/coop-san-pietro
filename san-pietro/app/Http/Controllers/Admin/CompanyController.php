@@ -72,11 +72,12 @@ class CompanyController extends Controller
 
         if ($user->hasRole('SUPER_ADMIN')) {
             // SUPER_ADMIN può vedere tutte le aziende come possibili parent
-            $parentCompanies = Company::whereIn('type', ['master', 'main'])->get();
+            $parentCompanies = Company::orderBy('name')->get();
             $allowedTypes = ['master', 'main', 'invited'];
         } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
             // San Pietro (PROPRIETARIO) può creare qualsiasi tipo di azienda
-            $parentCompanies = Company::whereIn('type', ['master', 'main'])->get();
+            // Vede tutte le aziende esistenti come possibili parent
+            $parentCompanies = Company::orderBy('name')->get();
             $allowedTypes = ['master', 'main', 'invited'];
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
             // Altri COMPANY_ADMIN possono creare solo aziende figlie della propria
@@ -189,20 +190,49 @@ class CompanyController extends Controller
         $user = auth()->user();
 
         $parentCompanies = [];
+        $allowedTypes = [];
+
         if ($user->hasRole('SUPER_ADMIN')) {
-            $parentCompanies = Company::whereIn('type', ['master', 'main'])
-                ->where('id', '!=', $company->id) // Evita auto-riferimenti
+            // SUPER_ADMIN vede tutte le aziende tranne quella corrente
+            $parentCompanies = Company::where('id', '!=', $company->id)
+                ->orderBy('name')
                 ->get();
+            $allowedTypes = ['master', 'main', 'invited'];
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            // San Pietro vede tutte le aziende tranne quella corrente
+            $parentCompanies = Company::where('id', '!=', $company->id)
+                ->orderBy('name')
+                ->get();
+            $allowedTypes = ['master', 'main', 'invited'];
+        } elseif ($user->hasRole('COMPANY_ADMIN')) {
+            // Altri COMPANY_ADMIN vedono solo la propria azienda come parent
+            $parentCompanies = Company::where('id', $user->company_id)->get();
+            $allowedTypes = ['invited'];
         }
 
-        return view('admin.companies.edit', compact('company', 'parentCompanies'));
+        return view('admin.companies.edit', compact('company', 'parentCompanies', 'allowedTypes'));
     }
 
     public function update(Request $request, Company $company)
     {
+        /** @var User $user */
+        $user = $request->user();
+
+        // Definisci i tipi consentiti in base al ruolo
+        $allowedTypes = [];
+        if ($user->hasRole('SUPER_ADMIN')) {
+            $allowedTypes = ['master', 'main', 'invited'];
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            // San Pietro può modificare qualsiasi tipo
+            $allowedTypes = ['master', 'main', 'invited'];
+        } else {
+            $allowedTypes = ['invited'];
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|string|in:master,main,invited',
+            'domain' => 'required|string|unique:companies,domain,' . $company->id,
+            'type' => 'required|string|in:' . implode(',', $allowedTypes),
             'parent_company_id' => 'nullable|exists:companies,id',
             'vat_number' => 'nullable|string|max:11|unique:companies,vat_number,' . $company->id,
             'tax_code' => 'nullable|string|max:16|unique:companies,tax_code,' . $company->id,
@@ -213,8 +243,11 @@ class CompanyController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'pec' => 'nullable|email|max:255',
-            'is_active' => 'boolean'
+            'is_active' => 'nullable|boolean'
         ]);
+
+        // Assicura che is_active sia booleano
+        $validated['is_active'] = $request->has('is_active');
 
         $company->update($validated);
 
