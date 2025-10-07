@@ -74,8 +74,8 @@ class TransportDocumentController extends Controller
             return TransportDocument::create($validated);
         });
 
-        return redirect()->route('transport-documents.index')
-            ->with('success', 'Documento di trasporto creato con successo.');
+        return redirect()->route('transport-documents.edit', $transportDocument)
+            ->with('success', 'Documento di trasporto creato con successo. Ora puoi aggiungere i prodotti.');
     }
 
     public function show(TransportDocument $transportDocument)

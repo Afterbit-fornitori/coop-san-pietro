@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('company_invitations', function (Blueprint $table) {
-            // Cambia business_type da ENUM a VARCHAR per permettere valori più lunghi
-            $table->string('business_type', 100)->change();
+            // Cambia business_type da ENUM a VARCHAR nullable
+            $table->string('business_type', 100)->nullable()->change();
 
-            // Cambia sector da ENUM a VARCHAR per permettere valori più lunghi
-            $table->string('sector', 100)->change();
+            // Cambia sector da ENUM a VARCHAR nullable
+            $table->string('sector', 100)->nullable()->change();
         });
     }
 

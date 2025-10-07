@@ -18,7 +18,12 @@ class CompanyPolicy
             return true;
         }
 
-        // Company admin può vedere la propria company e le sue child companies
+        // San Pietro (PROPRIETARIO - main company) può vedere TUTTE le aziende
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            return true;
+        }
+
+        // Altri Company admin possono vedere la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->id ||
                 $user->company_id === $company->parent_company_id;
@@ -30,7 +35,7 @@ class CompanyPolicy
 
     public function create(User $user): bool
     {
-        // SUPER_ADMIN può sempre creare aziende (master, main, invited)
+        // SUPER_ADMIN può sempre creare aziende (main, invited)
         if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
@@ -54,7 +59,12 @@ class CompanyPolicy
             return true;
         }
 
-        // Company admin può modificare la propria company e le sue child companies
+        // San Pietro (PROPRIETARIO - main company) può modificare TUTTE le aziende
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            return true;
+        }
+
+        // Altri Company admin possono modificare la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->id ||
                 $user->company_id === $company->parent_company_id;
@@ -69,7 +79,12 @@ class CompanyPolicy
             return true;
         }
 
-        // Company admin può eliminare solo le sue child companies (non se stessa)
+        // San Pietro (PROPRIETARIO - main company) può eliminare TUTTE le aziende (tranne se stessa)
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            return $user->company_id !== $company->id; // Non può eliminare se stesso
+        }
+
+        // Altri Company admin possono eliminare solo le sue child companies (non se stessa)
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->parent_company_id;
         }

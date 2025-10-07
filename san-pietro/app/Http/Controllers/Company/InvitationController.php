@@ -35,9 +35,15 @@ class InvitationController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
-        $invitations = CompanyInvitation::where('inviter_company_id', $user->company_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // San Pietro (proprietario piattaforma) vede TUTTI gli inviti
+        // Altri COMPANY_ADMIN vedono solo i propri inviti
+        if ($user->hasRole('SUPER_ADMIN') || ($user->company && $user->company->isMain())) {
+            $invitations = CompanyInvitation::orderBy('created_at', 'desc')->get();
+        } else {
+            $invitations = CompanyInvitation::where('inviter_company_id', $user->company_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         return view('company.invitations.index', compact('invitations'));
     }

@@ -12,6 +12,8 @@ class CompanyInvitation extends Model
 
     protected $fillable = [
         'inviter_company_id',
+        'invited_company_id',
+        'company_id', // Alias per inviter_company_id (per compatibilità)
         'email',
         'token',
         'company_name',
@@ -30,6 +32,11 @@ class CompanyInvitation extends Model
     public function inviterCompany(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'inviter_company_id');
+    }
+
+    public function invitedCompany(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'invited_company_id');
     }
 
     public function isExpired(): bool

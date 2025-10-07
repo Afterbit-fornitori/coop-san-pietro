@@ -58,7 +58,7 @@ class RegisteredUserController extends Controller
             $invitation = null;
             if ($request->invitation_token) {
                 $invitation = CompanyInvitation::where('token', $request->invitation_token)
-                    ->where('status', 'pending')
+                    ->whereIn('status', ['pending', 'viewed']) // Accetta sia pending che viewed
                     ->where('expires_at', '>', now())
                     ->first();
 
@@ -72,18 +72,28 @@ class RegisteredUserController extends Controller
                 }
             }
 
-            // Se c'è un invito, crea l'azienda e l'utente
+            // Se c'è un invito, gestisci l'azienda e l'utente
             if ($invitation) {
-                // Crea l'azienda invitata
-                $company = Company::create([
-                    'name' => $invitation->company_name,
-                    'type' => 'invited',
-                    'parent_company_id' => $invitation->inviter_company_id,
-                    'domain' => \Str::slug($invitation->company_name) . '.local',
-                    'is_active' => true,
-                ]);
+                // Verifica se l'azienda esiste già (creata da San Pietro)
+                if ($invitation->invited_company_id) {
+                    // L'azienda esiste già - usa quella
+                    $company = Company::findOrFail($invitation->invited_company_id);
+                } else {
+                    // L'azienda NON esiste - creala ora
+                    $company = Company::create([
+                        'name' => $invitation->company_name,
+                        'type' => 'invited',
+                        'parent_company_id' => $invitation->inviter_company_id,
+                        'domain' => \Str::slug($invitation->company_name) . '.local',
+                        'email' => $request->email,
+                        'is_active' => true,
+                    ]);
 
-                // Crea l'utente admin per la nuova azienda
+                    // Aggiorna l'invito con l'ID dell'azienda appena creata
+                    $invitation->update(['invited_company_id' => $company->id]);
+                }
+
+                // Crea l'utente admin per l'azienda
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -95,7 +105,7 @@ class RegisteredUserController extends Controller
                 // Assegna ruolo COMPANY_ADMIN
                 $user->assignRole('COMPANY_ADMIN');
 
-                // Aggiorna lo status dell'invito
+                // Aggiorna lo status dell'invito ad "accepted"
                 $invitation->update(['status' => 'accepted']);
 
             } else {

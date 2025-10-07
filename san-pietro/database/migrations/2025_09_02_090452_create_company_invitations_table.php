@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('company_invitations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inviter_company_id')->constrained('companies')->onDelete('cascade');
+            $table->foreignId('invited_company_id')->nullable()->constrained('companies')->onDelete('set null'); // ID azienda invitata
             $table->string('email');
             $table->string('token', 64)->unique();
             $table->string('company_name');
-            $table->enum('business_type', ['cooperativa', 'cdm', 'centro_spedizione']);
-            $table->enum('sector', ['mitili', 'vongole', 'misto']);
+            $table->enum('business_type', ['cooperativa', 'cdm', 'centro_spedizione'])->nullable();
+
+            $table->enum('sector', ['mitili', 'vongole', 'misto'])->nullable();
             $table->json('permissions')->nullable();
             $table->enum('status', ['pending', 'viewed', 'expired', 'accepted'])->default('pending');
             $table->timestamp('expires_at');

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('parent_company_id')->nullable();
-            $table->enum('type', ['master', 'main', 'invited']);
+            $table->enum('type', ['main', 'invited']); // Solo main (San Pietro) e invited (tutte le altre)
             $table->string('vat_number', 11)->nullable()->unique();
             $table->string('tax_code', 16)->nullable();
             $table->string('address')->nullable();

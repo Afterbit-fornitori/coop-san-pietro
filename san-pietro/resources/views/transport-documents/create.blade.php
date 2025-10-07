@@ -23,6 +23,12 @@
                     </div>
                 @endif
 
+                <!-- Info Box -->
+                <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700">
+                    <p class="font-semibold">ℹ️ Procedura di creazione</p>
+                    <p class="mt-1 text-sm">Compila i dati del documento. Dopo la creazione, potrai <strong>aggiungere i prodotti</strong> nella pagina di modifica.</p>
+                </div>
+
                 <form action="{{ route('transport-documents.store') }}" method="POST" class="space-y-6">
                     @csrf
 
