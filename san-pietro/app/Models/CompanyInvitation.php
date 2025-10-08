@@ -13,7 +13,6 @@ class CompanyInvitation extends Model
     protected $fillable = [
         'inviter_company_id',
         'invited_company_id',
-        'company_id', // Alias per inviter_company_id (per compatibilità)
         'email',
         'token',
         'company_name',

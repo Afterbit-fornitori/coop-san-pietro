@@ -10,7 +10,7 @@ class ProductionZoneController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(ProductionZone::class, 'production_zone');
+        $this->authorizeResource(ProductionZone::class, 'zone');
     }
     public function index()
     {

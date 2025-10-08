@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\CompanyInvitation;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +29,14 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Cambia status invito da 'pending' ad 'accepted' al primo login
+        $user = Auth::user();
+        if ($user && $user->email) {
+            CompanyInvitation::where('email', $user->email)
+                ->where('status', 'pending')
+                ->update(['status' => 'accepted']);
+        }
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }

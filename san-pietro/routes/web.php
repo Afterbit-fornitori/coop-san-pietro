@@ -198,7 +198,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'edit' => 'production-zones.edit',
             'update' => 'production-zones.update',
             'destroy' => 'production-zones.destroy',
-        ]);
+        ])->parameter('production-zones', 'zone');
 
         // Gestione Produzioni
         Route::resource('production', \App\Http\Controllers\ProductionController::class)->names([

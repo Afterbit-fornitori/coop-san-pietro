@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
 use App\Mail\CompanyInvitationMail;
+use App\Mail\CompanyAdminCreatedMail;
 
 class CompanyController extends Controller
 {
@@ -117,6 +118,8 @@ class CompanyController extends Controller
             'domain' => 'required|string|unique:companies,domain',
             'type' => 'required|string|in:' . implode(',', $allowedTypes),
             'parent_company_id' => 'nullable|exists:companies,id',
+            'business_type' => 'nullable|string|max:100',
+            'sector' => 'nullable|string|max:100',
             'vat_number' => 'nullable|string|max:11|unique:companies',
             'tax_code' => 'nullable|string|max:16|unique:companies',
             'address' => 'nullable|string|max:255',
@@ -172,37 +175,79 @@ class CompanyController extends Controller
                 'is_active' => $validated['is_active'] ?? true,
             ]);
 
-            // Se l'azienda è di tipo "invited" e ha un'email, crea automaticamente l'invito e invia l'email
-            $invitationSent = false;
-            if ($validated['type'] === 'invited' && !empty($validated['email'])) {
-                $invitation = CompanyInvitation::create([
-                    'company_id' => $user->company_id, // L'azienda che crea l'invito (San Pietro)
-                    'inviter_company_id' => $user->company_id,
-                    'invited_company_id' => $company->id, // NUOVO: ID dell'azienda appena creata
-                    'company_name' => $validated['name'],
+            // Crea automaticamente un admin per la nuova azienda
+            $adminCreated = false;
+            $adminEmailSent = false;
+            if (!empty($validated['email'])) {
+                // Genera una password temporanea
+                $temporaryPassword = Str::random(12);
+
+                $admin = User::create([
+                    'name' => $validated['name'] . ' Admin',
                     'email' => $validated['email'],
-                    'token' => Str::random(64),
-                    'status' => 'pending',
-                    'expires_at' => now()->addDays(7),
+                    'password' => Hash::make($temporaryPassword),
+                    'company_id' => $company->id,
+                    'is_active' => true,
+                    'email_verified_at' => null, // Richiede verifica email
                 ]);
 
-                // Invia l'email di invito
+                // Assegna il ruolo COMPANY_ADMIN
+                $admin->assignRole('COMPANY_ADMIN');
+                $adminCreated = true;
+
+                // Log della password temporanea (backup in caso email fallisca)
+                Log::info("Admin creato per azienda {$company->name} - Email: {$validated['email']} - Password temporanea: {$temporaryPassword}");
+
+                // Invia email con credenziali
                 try {
-                    Mail::to($validated['email'])->send(new CompanyInvitationMail($invitation));
-                    $invitationSent = true;
+                    Mail::to($validated['email'])->send(new CompanyAdminCreatedMail($company, $admin, $temporaryPassword));
+                    $adminEmailSent = true;
+                    Log::info('Email credenziali inviata con successo a: ' . $validated['email']);
+
+                    // Invia email di verifica
+                    $admin->sendEmailVerificationNotification();
+                    Log::info('Email verifica inviata con successo a: ' . $validated['email']);
                 } catch (\Exception $mailError) {
-                    // Log dell'errore ma continua comunque
-                    Log::error('Errore invio email invito azienda: ' . $mailError->getMessage());
+                    Log::error('ERRORE INVIO EMAIL: ' . $mailError->getMessage());
+                    Log::error('Stack trace: ' . $mailError->getTraceAsString());
+                }
+            }
+
+            // Se l'azienda è di tipo "invited" e ha un'email, crea automaticamente l'invito per tracciamento
+            if ($validated['type'] === 'invited' && !empty($validated['email'])) {
+                // Verifica se esiste già un invito per questa email
+                $existingInvitation = CompanyInvitation::where('email', $validated['email'])
+                    ->whereIn('status', ['pending', 'viewed'])
+                    ->first();
+
+                if (!$existingInvitation) {
+                    $invitation = CompanyInvitation::create([
+                        'inviter_company_id' => $user->company_id, // L'azienda che crea l'invito (San Pietro)
+                        'invited_company_id' => $company->id, // ID dell'azienda appena creata
+                        'company_name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'business_type' => $validated['business_type'] ?? null,
+                        'sector' => $validated['sector'] ?? null,
+                        'permissions' => ['members', 'productions', 'documents', 'reports'], // Tutti i permessi
+                        'token' => Str::random(64),
+                        'status' => 'pending', // PENDING: cambierà ad 'accepted' al primo login
+                        'expires_at' => now()->addDays(30),
+                    ]);
+
+                    Log::info("Invito tracciamento creato per azienda {$company->name} - Status: pending (cambierà ad accepted al login)");
                 }
             }
 
             DB::commit();
 
             $message = "Azienda '{$company->name}' creata con successo.";
-            if ($invitationSent) {
-                $message .= " Email di invito inviata a {$validated['email']}.";
-            } elseif ($validated['type'] === 'invited') {
-                $message .= " Ricorda di inviare manualmente l'invito all'azienda.";
+            if ($adminCreated) {
+                $message .= " Admin creato con email: {$validated['email']}.";
+                if ($adminEmailSent) {
+                    $message .= " Email con credenziali e link verifica inviati.";
+                } else {
+                    $message .= " ⚠️ Email credenziali non inviata (controlla log).";
+                }
             }
 
             return redirect()->route($this->getRoutePrefix() . '.companies.index')

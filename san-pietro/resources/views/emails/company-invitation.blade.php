@@ -36,8 +36,12 @@
             <p><strong>Dettagli dell'azienda invitata:</strong></p>
             <ul>
                 <li><strong>Nome Azienda:</strong> {{ $invitation->company_name }}</li>
+                @if($invitation->business_type)
                 <li><strong>Tipo di Business:</strong> {{ $invitation->business_type }}</li>
+                @endif
+                @if($invitation->sector)
                 <li><strong>Settore:</strong> {{ $invitation->sector }}</li>
+                @endif
                 <li><strong>Email:</strong> {{ $invitation->email }}</li>
             </ul>
 

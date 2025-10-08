@@ -88,11 +88,14 @@ class InvitationController extends Controller
 
     public function show(CompanyInvitation $invitation)
     {
+        $this->authorize('view', $invitation);
         return view('company.invitations.show', compact('invitation'));
     }
 
     public function resend(CompanyInvitation $invitation)
     {
+        $this->authorize('update', $invitation);
+
         if ($invitation->status !== 'pending') {
             return back()->withErrors(['error' => 'Solo gli inviti in attesa possono essere reinviati.']);
         }
@@ -111,6 +114,8 @@ class InvitationController extends Controller
 
     public function destroy(CompanyInvitation $invitation)
     {
+        $this->authorize('delete', $invitation);
+
         $companyName = $invitation->company_name;
         $invitation->delete();
 

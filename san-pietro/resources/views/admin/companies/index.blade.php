@@ -7,11 +7,16 @@
             <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold">Gestione Aziende</h2>
-                    @if(auth()->user()->hasRole('SUPER_ADMIN') || (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company && auth()->user()->company->isMain()))
-                    <a href="{{ route('admin.companies.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Nuova Azienda
-                    </a>
-                    @endif
+                    <div class="flex space-x-3">
+                        @if(auth()->user()->hasRole('SUPER_ADMIN') || (auth()->user()->hasRole('COMPANY_ADMIN') && auth()->user()->company && auth()->user()->company->isMain()))
+                        <a href="{{ route('company.invitations.index') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            Gestione Inviti
+                        </a>
+                        <a href="{{ route('admin.companies.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Nuova Azienda
+                        </a>
+                        @endif
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full bg-white rounded-lg overflow-hidden">

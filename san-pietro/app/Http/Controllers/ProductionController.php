@@ -67,12 +67,15 @@ class ProductionController extends Controller
             'date' => 'required|date',
             'quantity' => 'required|numeric|min:0',
             'notes' => 'nullable|string|max:1000',
-            'company_id' => 'required|exists:companies,id'
         ]);
+
+        // SICUREZZA: Imposta sempre company_id dell'utente autenticato
+        // Ignora qualsiasi company_id inviato dal form per prevenire privilege escalation
+        $validated['company_id'] = auth()->user()->company_id;
 
         Production::create($validated);
 
-        return redirect()->route('productions.index')
+        return redirect()->route('production.index')
             ->with('success', 'Produzione registrata con successo.');
     }
 

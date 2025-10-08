@@ -68,6 +68,35 @@
                             </div>
 
                             <div>
+                                <label for="business_type" class="block text-sm font-medium text-gray-700">Tipo Attività</label>
+                                <select name="business_type" id="business_type"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">Seleziona tipo attività</option>
+                                    <option value="Cooperativa di Pesca" {{ old('business_type') == 'Cooperativa di Pesca' ? 'selected' : '' }}>Cooperativa di Pesca</option>
+                                    <option value="Cooperativa Agricola" {{ old('business_type') == 'Cooperativa Agricola' ? 'selected' : '' }}>Cooperativa Agricola</option>
+                                    <option value="Società di Capitali" {{ old('business_type') == 'Società di Capitali' ? 'selected' : '' }}>Società di Capitali</option>
+                                    <option value="Ditta Individuale" {{ old('business_type') == 'Ditta Individuale' ? 'selected' : '' }}>Ditta Individuale</option>
+                                    <option value="Altro" {{ old('business_type') == 'Altro' ? 'selected' : '' }}>Altro</option>
+                                </select>
+                                @error('business_type')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label for="sector" class="block text-sm font-medium text-gray-700">Settore</label>
+                                <select name="sector" id="sector"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">Seleziona settore</option>
+                                    <option value="Mitilicoltura" {{ old('sector') == 'Mitilicoltura' ? 'selected' : '' }}>Mitilicoltura (Cozze)</option>
+                                    <option value="Vongole" {{ old('sector') == 'Vongole' ? 'selected' : '' }}>Vongole</option>
+                                    <option value="Ostriche" {{ old('sector') == 'Ostriche' ? 'selected' : '' }}>Ostriche</option>
+                                    <option value="Pesca" {{ old('sector') == 'Pesca' ? 'selected' : '' }}>Pesca</option>
+                                    <option value="Molluschicoltura" {{ old('sector') == 'Molluschicoltura' ? 'selected' : '' }}>Molluschicoltura</option>
+                                    <option value="Altro" {{ old('sector') == 'Altro' ? 'selected' : '' }}>Altro</option>
+                                </select>
+                                @error('sector')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
                                 <label for="vat_number" class="block text-sm font-medium text-gray-700">Partita IVA</label>
                                 <input type="text" name="vat_number" id="vat_number"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"

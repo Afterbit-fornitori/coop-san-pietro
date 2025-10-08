@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -154,19 +155,25 @@
             display: table;
             clear: both;
         }
+
+        .items-table {
+            width: 90%;
+            margin: 10px 0;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header con tipo documento e numerazione -->
         <div class="header">
             <h1>
                 @if($document->tipo_documento === 'DDT')
-                    DOCUMENTO DI TRASPORTO
+                DOCUMENTO DI TRASPORTO
                 @elseif($document->tipo_documento === 'DTN')
-                    DOCUMENTO DI TRASPORTO NAZIONALE
+                DOCUMENTO DI TRASPORTO NAZIONALE
                 @else
-                    DOCUMENTO DI TRASPORTO REGIONALE
+                DOCUMENTO DI TRASPORTO REGIONALE
                 @endif
             </h1>
 
@@ -193,17 +200,17 @@
             <div class="section-title">MITTENTE</div>
             <div class="info-row"><strong>{{ $company->name }}</strong></div>
             @if($company->address)
-                <div class="info-row">{{ $company->address }}</div>
-                <div class="info-row">{{ $company->zip_code }} {{ $company->city }} ({{ $company->province }})</div>
+            <div class="info-row">{{ $company->address }}</div>
+            <div class="info-row">{{ $company->zip_code }} {{ $company->city }} ({{ $company->province }})</div>
             @endif
             @if($company->vat_number)
-                <div class="info-row">P.IVA: {{ $company->vat_number }}</div>
+            <div class="info-row">P.IVA: {{ $company->vat_number }}</div>
             @endif
             @if($company->tax_code)
-                <div class="info-row">C.F.: {{ $company->tax_code }}</div>
+            <div class="info-row">C.F.: {{ $company->tax_code }}</div>
             @endif
             @if($company->phone)
-                <div class="info-row">Tel: {{ $company->phone }}</div>
+            <div class="info-row">Tel: {{ $company->phone }}</div>
             @endif
         </div>
 
@@ -214,10 +221,10 @@
             <div class="info-row">{{ $client->address }}</div>
             <div class="info-row">{{ $client->postal_code }} {{ $client->city }} ({{ $client->province }})</div>
             @if($client->vat_number)
-                <div class="info-row">P.IVA: {{ $client->vat_number }}</div>
+            <div class="info-row">P.IVA: {{ $client->vat_number }}</div>
             @endif
             @if($client->tax_code)
-                <div class="info-row">C.F.: {{ $client->tax_code }}</div>
+            <div class="info-row">C.F.: {{ $client->tax_code }}</div>
             @endif
         </div>
 
@@ -226,24 +233,24 @@
             <div class="section-title">DETTAGLI TRASPORTO</div>
             <div class="info-row"><strong>Causale:</strong> {{ $document->causale_trasporto }}</div>
             @if($document->ora_partenza)
-                <div class="info-row"><strong>Ora Partenza:</strong> {{ $document->ora_partenza }}</div>
+            <div class="info-row"><strong>Ora Partenza:</strong> {{ $document->ora_partenza }}</div>
             @endif
             @if($document->data_raccolta)
-                <div class="info-row"><strong>Data Raccolta:</strong> {{ \Carbon\Carbon::parse($document->data_raccolta)->format('d/m/Y') }}</div>
+            <div class="info-row"><strong>Data Raccolta:</strong> {{ \Carbon\Carbon::parse($document->data_raccolta)->format('d/m/Y') }}</div>
             @endif
             @if($document->mezzo_trasporto)
-                <div class="info-row"><strong>Mezzo di Trasporto:</strong> {{ $document->mezzo_trasporto }}</div>
+            <div class="info-row"><strong>Mezzo di Trasporto:</strong> {{ $document->mezzo_trasporto }}</div>
             @endif
             @if($productionZone)
-                <div class="info-row"><strong>Zona di Produzione:</strong> {{ $productionZone->codice }} - {{ $productionZone->nome }}</div>
+            <div class="info-row"><strong>Zona di Produzione:</strong> {{ $productionZone->codice }} - {{ $productionZone->nome }}</div>
             @endif
             @if($member)
-                <div class="info-row"><strong>Produttore:</strong> {{ $member->full_name }}</div>
+            <div class="info-row"><strong>Produttore:</strong> {{ $member->full_name }}</div>
             @endif
         </div>
 
         <!-- Tabella Prodotti -->
-        <table>
+        <table class="items-table">
             <thead>
                 <tr>
                     <th style="width: 10%;">Codice</th>
@@ -256,29 +263,29 @@
             </thead>
             <tbody>
                 @foreach($items as $item)
-                    <tr>
-                        <td>{{ $item->product->codice }}</td>
-                        <td>
-                            {{ $item->product->nome_commerciale }}
-                            @if($item->product->nome_scientifico)
-                                <br><small><em>{{ $item->product->nome_scientifico }}</em></small>
-                            @endif
-                        </td>
-                        <td class="text-center">{{ number_format($item->quantita_kg, 2, ',', '.') }}</td>
-                        <td class="text-center">{{ $item->numero_colli }}</td>
-                        <td class="text-right">{{ number_format($item->prezzo_unitario, 2, ',', '.') }}</td>
-                        <td class="text-right">{{ number_format($item->totale, 2, ',', '.') }}</td>
-                    </tr>
+                <tr>
+                    <td>{{ $item->product->codice }}</td>
+                    <td>
+                        {{ $item->product->nome_commerciale }}
+                        @if($item->product->nome_scientifico)
+                        <br><small><em>{{ $item->product->nome_scientifico }}</em></small>
+                        @endif
+                    </td>
+                    <td class="text-center">{{ number_format($item->quantita_kg, 2, ',', '.') }}</td>
+                    <td class="text-center">{{ $item->numero_colli }}</td>
+                    <td class="text-right">{{ number_format($item->prezzo_unitario, 2, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($item->totale, 2, ',', '.') }}</td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
 
         <!-- Annotazioni -->
         @if($document->annotazioni)
-            <div class="section">
-                <div class="section-title">ANNOTAZIONI</div>
-                <div>{{ $document->annotazioni }}</div>
-            </div>
+        <div class="section">
+            <div class="section-title">ANNOTAZIONI</div>
+            <div>{{ $document->annotazioni }}</div>
+        </div>
         @endif
 
         <!-- Totali -->
@@ -323,9 +330,10 @@
         <div class="footer">
             Documento generato il {{ now()->format('d/m/Y H:i') }} - {{ $company->name }}
             @if($company->pec)
-                - PEC: {{ $company->pec }}
+            - PEC: {{ $company->pec }}
             @endif
         </div>
     </div>
 </body>
+
 </html>

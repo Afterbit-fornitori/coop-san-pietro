@@ -8,12 +8,24 @@ class UserPolicy
 {
     public function viewAny(User $user): bool
     {
+        if (
+            $user->hasRole('SUPER_ADMIN') ||
+            ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain())
+        ) {
+            return true;
+        }
         return $user->hasPermissionTo('view users');
     }
 
     public function view(User $user, User $model): bool
     {
-        if ($user->hasRole('SUPER_ADMIN')) {
+        // if ($user->hasRole('SUPER_ADMIN')) {
+        //     return true;
+        // }
+        if (
+            $user->hasRole('SUPER_ADMIN') ||
+            ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain())
+        ) {
             return true;
         }
 

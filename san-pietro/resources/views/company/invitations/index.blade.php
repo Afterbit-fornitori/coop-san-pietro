@@ -66,9 +66,6 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('company.invitations.show', $invitation) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                    Dettagli
-                                </a>
                                 @if($invitation->status == 'pending' && !$invitation->isExpired())
                                 <form action="{{ route('company.invitations.resend', $invitation) }}" method="POST" class="inline mr-3">
                                     @csrf

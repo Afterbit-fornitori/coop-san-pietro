@@ -13,19 +13,19 @@
 
             <div class="bg-green-100 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">DDT Totali</h3>
-                <p class="text-3xl font-bold">0</p>
+                <p class="text-3xl font-bold">{{ $transportDocumentsCount }}</p>
                 <p class="text-sm mt-2">In attesa: 0</p>
             </div>
 
             <div class="bg-yellow-100 p-4 rounded-lg">
-                <h3 class="text-lg font-semibold mb-2">Fornitori</h3>
-                <p class="text-3xl font-bold">0</p>
+                <h3 class="text-lg font-semibold mb-2">Clienti</h3>
+                <p class="text-3xl font-bold">{{ $clientsCount }}</p>
                 <p class="text-sm mt-2">Attivi: 0</p>
             </div>
 
             <div class="bg-purple-100 p-4 rounded-lg">
                 <h3 class="text-lg font-semibold mb-2">Prodotti</h3>
-                <p class="text-3xl font-bold">0</p>
+                <p class="text-3xl font-bold">{{ $productsCount }}</p>
                 <p class="text-sm mt-2">Categorie: 0</p>
             </div>
         </div>

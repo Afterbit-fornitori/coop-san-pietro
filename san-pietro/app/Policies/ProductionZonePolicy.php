@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\ProductionZone;
 use App\Models\User;
-use FontLib\Table\Type\name;
 
 class ProductionZonePolicy
 {
@@ -45,9 +44,14 @@ class ProductionZonePolicy
         if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->name === 'Admin pippo') {
-            return true;
+
+        // San Pietro (main company) può modificare le zone delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            $canModify = $user->company_id === $productionZone->company_id ||
+                ($productionZone->company && $productionZone->company->parent_company_id === $user->company_id);
+            return $canModify && $user->hasPermissionTo('edit production zones');
         }
+
         // Solo la propria company può modificare le zone
         return $user->company_id === $productionZone->company_id &&
             $user->hasPermissionTo('edit production zones');
@@ -57,6 +61,13 @@ class ProductionZonePolicy
     {
         if ($user->hasRole('SUPER_ADMIN')) {
             return true;
+        }
+
+        // San Pietro (main company) può eliminare le zone delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            $canDelete = $user->company_id === $productionZone->company_id ||
+                ($productionZone->company && $productionZone->company->parent_company_id === $user->company_id);
+            return $canDelete && $user->hasPermissionTo('delete production zones');
         }
 
         // Solo COMPANY_ADMIN può eliminare zone della propria company

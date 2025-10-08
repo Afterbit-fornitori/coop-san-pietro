@@ -43,6 +43,13 @@ class LoadingUnloadingRegisterPolicy
             return true;
         }
 
+        // San Pietro (main company) può modificare i registri delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            $canModify = $user->company_id === $register->company_id ||
+                        ($register->company && $register->company->parent_company_id === $user->company_id);
+            return $canModify && $user->hasPermissionTo('edit loading unloading');
+        }
+
         return $user->company_id === $register->company_id &&
                $user->hasPermissionTo('edit loading unloading');
     }
@@ -51,6 +58,13 @@ class LoadingUnloadingRegisterPolicy
     {
         if ($user->hasRole('SUPER_ADMIN')) {
             return true;
+        }
+
+        // San Pietro (main company) può eliminare i registri delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            $canDelete = $user->company_id === $register->company_id ||
+                        ($register->company && $register->company->parent_company_id === $user->company_id);
+            return $canDelete && $user->hasPermissionTo('delete loading unloading');
         }
 
         return $user->hasRole('COMPANY_ADMIN') &&

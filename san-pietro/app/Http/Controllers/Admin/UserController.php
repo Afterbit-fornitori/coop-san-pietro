@@ -30,14 +30,19 @@ class UserController extends Controller
         // Filtra gli utenti in base al ruolo dell'utente corrente
         /** @var User $currentUser */
         $currentUser = $request->user();
-        if ($currentUser->hasRole('COMPANY_ADMIN')) {
-            // Admin della company vede solo gli utenti della sua company e delle company figlie
-            $query->whereIn('company_id', [
-                $currentUser->company_id,
-                ...Company::where('parent_company_id', $currentUser->company_id)->pluck('id')
-            ]);
-        } elseif (!$currentUser->hasRole('SUPER_ADMIN')) {
-            // Utenti normali vedono solo il proprio profilo
+
+        if ($currentUser->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN vede TUTTI gli utenti senza filtri
+            // Query rimane inalterata
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company && $currentUser->company->isMain()) {
+            // San Pietro (main company) vede TUTTI gli utenti di tutte le aziende accessibili
+            // $accessibleCompanyIds = $currentUser->getAccessibleCompanies()->pluck('id')->toArray();
+            // $query->whereIn('company_id', $accessibleCompanyIds);
+        } elseif ($currentUser->hasRole('COMPANY_ADMIN')) {
+            // Altri COMPANY_ADMIN vedono solo utenti della propria azienda
+            $query->where('company_id', $currentUser->company_id);
+        } else {
+            // COMPANY_USER e altri vedono solo il proprio profilo
             $query->where('id', $currentUser->id);
         }
 
