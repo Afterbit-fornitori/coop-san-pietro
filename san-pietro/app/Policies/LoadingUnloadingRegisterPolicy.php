@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\LoadingUnloadingRegister;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class LoadingUnloadingRegisterPolicy
 {
@@ -15,21 +16,46 @@ class LoadingUnloadingRegisterPolicy
     public function view(User $user, LoadingUnloadingRegister $register): bool
     {
         if ($user->hasRole('SUPER_ADMIN')) {
+            \Log::info('LoadingUnloadingPolicy view: SUPER_ADMIN - TRUE');
             return true;
         }
 
         // COMPANY_ADMIN (San Pietro) può vedere i registri della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             if ($user->company && $user->company->isMain()) {
-                return $user->company_id === $register->company_id ||
-                       ($register->company && $register->company->parent_company_id === $user->company_id);
+                $canView = $user->company_id === $register->company_id ||
+                          ($register->company && $register->company->parent_company_id === $user->company_id);
+
+                \Log::info('LoadingUnloadingPolicy view: San Pietro', [
+                    'user_company_id' => $user->company_id,
+                    'register_company_id' => $register->company_id,
+                    'result' => $canView
+                ]);
+
+                return $canView;
             }
 
-            return $user->company_id === $register->company_id;
+            $canView = $user->company_id === $register->company_id;
+
+            \Log::info('LoadingUnloadingPolicy view: Other COMPANY_ADMIN', [
+                'user_company_id' => $user->company_id,
+                'register_company_id' => $register->company_id,
+                'result' => $canView
+            ]);
+
+            return $canView;
         }
 
         // COMPANY_USER può vedere solo i registri della propria company
-        return $user->company_id === $register->company_id;
+        $canView = $user->company_id === $register->company_id;
+
+        \Log::info('LoadingUnloadingPolicy view: COMPANY_USER', [
+            'user_company_id' => $user->company_id,
+            'register_company_id' => $register->company_id,
+            'result' => $canView
+        ]);
+
+        return $canView;
     }
 
     public function create(User $user): bool
@@ -43,15 +69,28 @@ class LoadingUnloadingRegisterPolicy
             return true;
         }
 
-        // San Pietro (main company) può modificare i registri delle proprie aziende e quelle invitate
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
-            $canModify = $user->company_id === $register->company_id ||
-                        ($register->company && $register->company->parent_company_id === $user->company_id);
-            return $canModify && $user->hasPermissionTo('edit loading unloading');
+        // COMPANY_ADMIN può modificare i propri registri
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            // San Pietro (main company) può modificare tutti i registri
+            if ($user->company && $user->company->isMain()) {
+                $canModify = $user->company_id === $register->company_id ||
+                            ($register->company && $register->company->parent_company_id === $user->company_id);
+
+                Log::info('LoadingUnloadingPolicy update: San Pietro', [
+                    'user_company_id' => $user->company_id,
+                    'register_company_id' => $register->company_id,
+                    'result' => $canModify
+                ]);
+
+                return $canModify;
+            }
+
+            // Altri COMPANY_ADMIN possono modificare solo i propri registri
+            return $user->company_id === $register->company_id;
         }
 
-        return $user->company_id === $register->company_id &&
-               $user->hasPermissionTo('edit loading unloading');
+        // COMPANY_USER può modificare solo i propri registri
+        return $user->company_id === $register->company_id;
     }
 
     public function delete(User $user, LoadingUnloadingRegister $register): bool
@@ -60,15 +99,27 @@ class LoadingUnloadingRegisterPolicy
             return true;
         }
 
-        // San Pietro (main company) può eliminare i registri delle proprie aziende e quelle invitate
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
-            $canDelete = $user->company_id === $register->company_id ||
-                        ($register->company && $register->company->parent_company_id === $user->company_id);
-            return $canDelete && $user->hasPermissionTo('delete loading unloading');
+        // COMPANY_ADMIN può eliminare i propri registri
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            // San Pietro (main company) può eliminare tutti i registri
+            if ($user->company && $user->company->isMain()) {
+                $canDelete = $user->company_id === $register->company_id ||
+                            ($register->company && $register->company->parent_company_id === $user->company_id);
+
+                Log::info('LoadingUnloadingPolicy delete: San Pietro', [
+                    'user_company_id' => $user->company_id,
+                    'register_company_id' => $register->company_id,
+                    'result' => $canDelete
+                ]);
+
+                return $canDelete;
+            }
+
+            // Altri COMPANY_ADMIN possono eliminare solo i propri registri
+            return $user->company_id === $register->company_id;
         }
 
-        return $user->hasRole('COMPANY_ADMIN') &&
-               $user->company_id === $register->company_id &&
-               $user->hasPermissionTo('delete loading unloading');
+        // COMPANY_USER non può eliminare (solo COMPANY_ADMIN)
+        return false;
     }
 }

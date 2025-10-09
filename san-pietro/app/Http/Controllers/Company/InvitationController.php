@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use App\Mail\CompanyInvitationMail;
+use App\Mail\CompanyAdminCreatedMail;
 use App\Models\CompanyInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class InvitationController extends Controller
@@ -36,54 +38,19 @@ class InvitationController extends Controller
         $user = auth()->user();
 
         // San Pietro (proprietario piattaforma) vede TUTTI gli inviti
-        // Altri COMPANY_ADMIN vedono solo i propri inviti
+        // Gli inviti vengono creati automaticamente quando si crea un'azienda in Admin\CompanyController
         if ($user->hasRole('SUPER_ADMIN') || ($user->company && $user->company->isMain())) {
-            $invitations = CompanyInvitation::orderBy('created_at', 'desc')->get();
+            $invitations = CompanyInvitation::with('invitedCompany')
+                ->orderBy('created_at', 'desc')
+                ->get();
         } else {
-            $invitations = CompanyInvitation::where('inviter_company_id', $user->company_id)
+            $invitations = CompanyInvitation::with('invitedCompany')
+                ->where('inviter_company_id', $user->company_id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
 
         return view('company.invitations.index', compact('invitations'));
-    }
-
-    public function create()
-    {
-        return view('company.invitations.create');
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'email' => 'required|email|unique:company_invitations,email',
-            'company_name' => 'required|string|max:255',
-            'business_type' => 'required|string|max:255',
-            'sector' => 'required|string|max:255',
-            'permissions' => 'array',
-            'permissions.*' => 'string|in:members,productions,documents,reports'
-        ]);
-
-        /** @var User $user */
-        $user = auth()->user();
-
-        $invitation = CompanyInvitation::create([
-            'inviter_company_id' => $user->company_id,
-            'email' => $validated['email'],
-            'company_name' => $validated['company_name'],
-            'business_type' => $validated['business_type'],
-            'sector' => $validated['sector'],
-            'permissions' => $validated['permissions'] ?? [],
-            'token' => Str::random(64),
-            'expires_at' => now()->addDays(7), // Invito valido per 7 giorni
-            'status' => 'pending'
-        ]);
-
-        // Invia email di invito
-        Mail::to($validated['email'])->send(new CompanyInvitationMail($invitation));
-
-        return redirect()->route('company.invitations.index')
-            ->with('success', "Invito inviato a {$validated['company_name']} ({$validated['email']}).");
     }
 
     public function show(CompanyInvitation $invitation)
@@ -96,20 +63,31 @@ class InvitationController extends Controller
     {
         $this->authorize('update', $invitation);
 
-        if ($invitation->status !== 'pending') {
-            return back()->withErrors(['error' => 'Solo gli inviti in attesa possono essere reinviati.']);
+        // Trova l'utente admin dell'azienda invitata
+        $admin = User::where('company_id', $invitation->invited_company_id)
+            ->whereHas('roles', function($q) {
+                $q->where('name', 'COMPANY_ADMIN');
+            })
+            ->first();
+
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Admin dell\'azienda non trovato.']);
         }
 
-        // Aggiorna la data di scadenza
-        $invitation->update([
-            'expires_at' => now()->addDays(7),
-            'token' => Str::random(64)
-        ]);
+        // Genera nuova password temporanea
+        $temporaryPassword = Str::random(12);
+        $admin->update(['password' => Hash::make($temporaryPassword)]);
 
-        // Invia email di invito
-        Mail::to($invitation->email)->send(new CompanyInvitationMail($invitation));
+        // Invia email con nuove credenziali
+        Mail::to($admin->email)->send(new CompanyAdminCreatedMail(
+            $admin->company,
+            $admin,
+            $temporaryPassword
+        ));
 
-        return back()->with('success', 'Invito reinviato con successo.');
+        Log::info("Credenziali reinviate per {$admin->email} - Nuova password temporanea: {$temporaryPassword}");
+
+        return back()->with('success', 'Credenziali reinviate con successo all\'admin.');
     }
 
     public function destroy(CompanyInvitation $invitation)

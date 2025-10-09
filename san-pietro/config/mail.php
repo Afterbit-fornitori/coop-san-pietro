@@ -131,4 +131,10 @@ return [
         ],
     ],
 
+
+    'to' => [
+        'address' => env('MAIL_TO_ADDRESS', 'l.marzocchi@afterbit.com'),
+        'name' => env('MAIL_TO_NAME', 'Amministrazione'),
+    ],
+
 ];

@@ -35,9 +35,10 @@ class UserController extends Controller
             // SUPER_ADMIN vede TUTTI gli utenti senza filtri
             // Query rimane inalterata
         } elseif ($currentUser->hasRole('COMPANY_ADMIN') && $currentUser->company && $currentUser->company->isMain()) {
-            // San Pietro (main company) vede TUTTI gli utenti di tutte le aziende accessibili
-            // $accessibleCompanyIds = $currentUser->getAccessibleCompanies()->pluck('id')->toArray();
-            // $query->whereIn('company_id', $accessibleCompanyIds);
+            // San Pietro (main company) vede TUTTI gli utenti di TUTTE le aziende
+            // Non applica nessun filtro, esattamente come SUPER_ADMIN
+            // Query rimane inalterata
+            \Log::info('San Pietro - Vede TUTTI gli utenti (nessun filtro applicato)');
         } elseif ($currentUser->hasRole('COMPANY_ADMIN')) {
             // Altri COMPANY_ADMIN vedono solo utenti della propria azienda
             $query->where('company_id', $currentUser->company_id);

@@ -12,25 +12,48 @@ class LoadingUnloadingRegisterController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(LoadingUnloadingRegister::class, 'loading_unloading_register');
+        $this->authorizeResource(LoadingUnloadingRegister::class, 'loading_unloading');
     }
 
     public function index()
     {
-        $registers = LoadingUnloadingRegister::with(['product', 'transportDocument'])
-            ->orderBy('data_operazione', 'desc')
-            ->paginate(15);
+        $user = auth()->user();
+        $query = LoadingUnloadingRegister::with(['product', 'transportDocument', 'company']);
+
+        // Filtra in base al ruolo
+        if ($user->hasRole('SUPER_ADMIN')) {
+            // SUPER_ADMIN vede tutto
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+            // San Pietro vede i propri registri + quelli delle aziende invitate
+            $query->where(function($q) use ($user) {
+                $q->where('company_id', $user->company_id)
+                  ->orWhereHas('company', function($companyQuery) use ($user) {
+                      $companyQuery->where('parent_company_id', $user->company_id);
+                  });
+            });
+        } else {
+            // Altri vedono solo i propri registri
+            $query->where('company_id', $user->company_id);
+        }
+
+        $registers = $query->orderBy('data_operazione', 'desc')->paginate(15);
 
         return view('loading-unloading.index', compact('registers'));
     }
 
     public function create()
     {
+        $user = auth()->user();
+
+        // Filtra prodotti per azienda
         $products = Product::where('is_active', true)
+            ->where('company_id', $user->company_id)
             ->orderBy('nome_commerciale')
             ->get();
 
-        $transportDocuments = TransportDocument::orderBy('data_documento', 'desc')
+        // Filtra documenti di trasporto per azienda
+        $transportDocuments = TransportDocument::where('company_id', $user->company_id)
+            ->orderBy('data_documento', 'desc')
             ->take(50)
             ->get();
 
@@ -76,11 +99,17 @@ class LoadingUnloadingRegisterController extends Controller
 
     public function edit(LoadingUnloadingRegister $loading_unloading)
     {
+        $user = auth()->user();
+
+        // Filtra prodotti per azienda
         $products = Product::where('is_active', true)
+            ->where('company_id', $user->company_id)
             ->orderBy('nome_commerciale')
             ->get();
 
-        $transportDocuments = TransportDocument::orderBy('data_documento', 'desc')
+        // Filtra documenti di trasporto per azienda
+        $transportDocuments = TransportDocument::where('company_id', $user->company_id)
+            ->orderBy('data_documento', 'desc')
             ->take(50)
             ->get();
 

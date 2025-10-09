@@ -5,9 +5,7 @@
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold">Inviti Aziende</h2>
-            <a href="{{ route('company.invitations.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Nuovo Invito
-            </a>
+
         </div>
 
         @if(session('success'))
@@ -78,7 +76,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900"
-                                            onclick="return confirm('Sei sicuro di voler eliminare questo invito?')">
+                                        onclick="return confirm('Sei sicuro di voler eliminare questo invito?')">
                                         Elimina
                                     </button>
                                 </form>
@@ -87,7 +85,7 @@
                         @empty
                         <tr>
                             <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                Nessun invito trovato. Clicca su "Nuovo Invito" per iniziare.
+                                Nessun invito trovato.
                             </td>
                         </tr>
                         @endforelse

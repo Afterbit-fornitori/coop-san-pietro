@@ -77,6 +77,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if($users->isEmpty())
+                <div class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded">
+                    <p class="text-gray-600 text-center">Nessun utente trovato.</p>
+                </div>
+                @endif
+
+                <div class="mt-4">
+                    {{ $users->links() }}
+                </div>
             </div>
         </div>
     </div>

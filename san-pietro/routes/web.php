@@ -111,10 +111,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
-        // Gestione Inviti (solo COMPANY_ADMIN)
+        // Gestione Inviti (solo COMPANY_ADMIN) - SOLO VISUALIZZAZIONE e GESTIONE
+        // Gli inviti vengono creati automaticamente in Admin\CompanyController
         Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
-        Route::get('/invitations/create', [InvitationController::class, 'create'])->name('invitations.create');
-        Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
         Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
         Route::post('/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
         Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
