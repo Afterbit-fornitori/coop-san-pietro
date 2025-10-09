@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .btn-annulla:hover {
+        background-color: #4B5563;
+        color: white;
+
+    }
+</style>
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="flex justify-between items-center mb-6">
@@ -143,7 +150,7 @@
 
             <!-- Buttons -->
             <div class="flex justify-end space-x-4">
-                <a href="{{ route('clients.index') }}" class="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                <a href="{{ route('clients.index') }}" class="btn-annulla px-6 py-2 bg-white text-black border border-black rounded border-black">
                     Annulla
                 </a>
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">

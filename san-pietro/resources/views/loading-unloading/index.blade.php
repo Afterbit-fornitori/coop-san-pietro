@@ -26,7 +26,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prodotto</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lotto</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantità (kg)</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DDT</th>
+                            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DDT</th> -->
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
                         </tr>
                     </thead>
@@ -52,37 +52,37 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm space-y-1">
                                     @if($register->kg_reimmersione > 0)
-                                        <div><span class="text-gray-500">Reim:</span> {{ number_format($register->kg_reimmersione, 2, ',', '.') }} kg</div>
+                                    <div><span class="text-gray-500">Reim:</span> {{ number_format($register->kg_reimmersione, 2, ',', '.') }} kg</div>
                                     @endif
                                     @if($register->kg_piccola > 0)
-                                        <div><span class="text-gray-500">Piccola:</span> {{ number_format($register->kg_piccola, 2, ',', '.') }} kg</div>
+                                    <div><span class="text-gray-500">Piccola:</span> {{ number_format($register->kg_piccola, 2, ',', '.') }} kg</div>
                                     @endif
                                     @if($register->kg_media > 0)
-                                        <div><span class="text-gray-500">Media:</span> {{ number_format($register->kg_media, 2, ',', '.') }} kg</div>
+                                    <div><span class="text-gray-500">Media:</span> {{ number_format($register->kg_media, 2, ',', '.') }} kg</div>
                                     @endif
                                     @if($register->kg_grossa > 0)
-                                        <div><span class="text-gray-500">Grossa:</span> {{ number_format($register->kg_grossa, 2, ',', '.') }} kg</div>
+                                    <div><span class="text-gray-500">Grossa:</span> {{ number_format($register->kg_grossa, 2, ',', '.') }} kg</div>
                                     @endif
                                     @if($register->kg_granchio > 0)
-                                        <div><span class="text-gray-500">Granchio:</span> {{ number_format($register->kg_granchio, 2, ',', '.') }} kg</div>
+                                    <div><span class="text-gray-500">Granchio:</span> {{ number_format($register->kg_granchio, 2, ',', '.') }} kg</div>
                                     @endif
                                     @php
-                                        $totale = $register->kg_reimmersione + $register->kg_piccola + $register->kg_media + $register->kg_grossa + $register->kg_granchio;
+                                    $totale = $register->kg_reimmersione + $register->kg_piccola + $register->kg_media + $register->kg_grossa + $register->kg_granchio;
                                     @endphp
                                     @if($totale > 0)
-                                        <div class="font-semibold border-t pt-1"><span class="text-gray-500">Totale:</span> {{ number_format($totale, 2, ',', '.') }} kg</div>
+                                    <div class="font-semibold border-t pt-1"><span class="text-gray-500">Totale:</span> {{ number_format($totale, 2, ',', '.') }} kg</div>
                                     @endif
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <!-- <td class="px-6 py-4 whitespace-nowrap">
                                 @if($register->transportDocument)
-                                    <a href="{{ route('documents.show', $register->transportDocument) }}" class="text-blue-600 hover:text-blue-900">
-                                        {{ $register->transportDocument->numero }}
-                                    </a>
+                                <a href="{{ route('transport-documents.show', $register->transportDocument) }}" class="text-blue-600 hover:text-blue-900">
+                                    {{ $register->transportDocument->numero }}
+                                </a>
                                 @else
-                                    <span class="text-gray-400">-</span>
+                                <span class="text-gray-400">-</span>
                                 @endif
-                            </td>
+                            </td> -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <a href="{{ route('loading-unloading.show', $register) }}" class="text-green-600 hover:text-green-900 mr-3">
                                     Dettagli
@@ -94,7 +94,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900"
-                                            onclick="return confirm('Sei sicuro di voler eliminare questa registrazione?')">
+                                        onclick="return confirm('Sei sicuro di voler eliminare questa registrazione?')">
                                         Elimina
                                     </button>
                                 </form>
