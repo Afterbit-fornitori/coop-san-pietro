@@ -20,12 +20,12 @@ class MemberPolicy
 
         // COMPANY_ADMIN (San Pietro) può vedere i membri della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 // San Pietro può vedere i propri membri e quelli delle aziende invitate
-                return $user->company_id === $member->company_id || 
-                       ($member->company && $member->company->parent_company_id === $user->company_id);
+                return $user->company_id === $member->company_id ||
+                       $member->company?->parent_company_id === $user->company_id;
             }
-            
+
             // Altri COMPANY_ADMIN possono vedere solo i propri membri
             return $user->company_id === $member->company_id;
         }

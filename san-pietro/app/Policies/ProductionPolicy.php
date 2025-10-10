@@ -28,10 +28,10 @@ class ProductionPolicy
             return true;
         }
 
-        // San Pietro (main company) può vedere produzioni di aziende child
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può vedere produzioni di aziende child
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return $production->company_id === $user->company_id ||
-                $production->company->parent_company_id === $user->company_id;
+                $production->company?->parent_company_id === $user->company_id;
         }
 
         // Altri utenti vedono solo le proprie produzioni
@@ -58,10 +58,10 @@ class ProductionPolicy
             return true;
         }
 
-        // San Pietro (main company) può modificare produzioni di aziende child
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può modificare produzioni di aziende child
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             $canModify = $production->company_id === $user->company_id ||
-                $production->company->parent_company_id === $user->company_id;
+                $production->company?->parent_company_id === $user->company_id;
             return $canModify && $user->hasPermissionTo('edit production');
         }
 

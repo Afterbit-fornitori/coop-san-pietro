@@ -86,18 +86,21 @@ class User extends Authenticatable implements MustVerifyEmail
             return true;
         }
 
-        // COMPANY_ADMIN (San Pietro) può accedere alla propria azienda e a quelle invitate
+        // COMPANY_ADMIN di San Pietro può accedere a TUTTE le aziende
+        if ($this->isCompanyAdmin() && $this->company && $this->company->isSanPietro()) {
+            return true;
+        }
+
+        // Altri COMPANY_ADMIN possono accedere alla propria azienda e alle sub-aziende
         if ($this->isCompanyAdmin() && $this->company) {
             // Può accedere alla propria azienda
             if ($this->company_id === $companyId) {
                 return true;
             }
 
-            // Può accedere alle aziende che ha invitato (solo se è l'azienda principale)
-            if ($this->company->isMain()) {
-                $invitedCompany = Company::find($companyId);
-                return $invitedCompany && $invitedCompany->parent_company_id === $this->company_id;
-            }
+            // Può accedere alle aziende figlie (sub-aziende assegnate)
+            $targetCompany = Company::find($companyId);
+            return $targetCompany && $targetCompany->parent_company_id === $this->company_id;
         }
 
         // COMPANY_USER può accedere solo alla propria azienda
@@ -115,8 +118,13 @@ class User extends Authenticatable implements MustVerifyEmail
             return Company::all();
         }
 
-        if ($this->isCompanyAdmin() && $this->company && $this->company->isMain()) {
-            // Restituisce la propria azienda + quelle invitate
+        // San Pietro vede TUTTE le aziende
+        if ($this->isCompanyAdmin() && $this->company?->isSanPietro()) {
+            return Company::all();
+        }
+
+        // Altri COMPANY_ADMIN vedono solo la propria azienda + sub-aziende assegnate
+        if ($this->isCompanyAdmin()) {
             return Company::where('id', $this->company_id)
                 ->orWhere('parent_company_id', $this->company_id)
                 ->get();
@@ -133,7 +141,13 @@ class User extends Authenticatable implements MustVerifyEmail
             return $query;
         }
 
-        if ($user->isCompanyAdmin() && $user->company && $user->company->isMain()) {
+        // San Pietro vede TUTTI gli utenti
+        if ($user->isCompanyAdmin() && $user->company?->isSanPietro()) {
+            return $query;
+        }
+
+        // Altri COMPANY_ADMIN vedono solo utenti della propria azienda + sub-aziende
+        if ($user->isCompanyAdmin()) {
             $accessibleCompanyIds = $user->getAccessibleCompanies()->pluck('id');
             return $query->whereIn('company_id', $accessibleCompanyIds);
         }

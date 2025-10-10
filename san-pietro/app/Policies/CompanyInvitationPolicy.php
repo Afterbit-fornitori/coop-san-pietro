@@ -13,9 +13,9 @@ class CompanyInvitationPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Solo SUPER_ADMIN o San Pietro (main company) possono vedere inviti
+        // Solo SUPER_ADMIN o San Pietro possono vedere inviti
         return $user->hasRole('SUPER_ADMIN') ||
-               ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain());
+               ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro());
     }
 
     /**
@@ -28,8 +28,8 @@ class CompanyInvitationPolicy
             return true;
         }
 
-        // San Pietro (main company) può vedere tutti gli inviti
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può vedere tutti gli inviti
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 
@@ -42,9 +42,9 @@ class CompanyInvitationPolicy
      */
     public function create(User $user): bool
     {
-        // Solo SUPER_ADMIN o San Pietro (main company) possono creare inviti
+        // Solo SUPER_ADMIN o San Pietro possono creare inviti
         return $user->hasRole('SUPER_ADMIN') ||
-               ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain());
+               ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro());
     }
 
     /**
@@ -57,8 +57,8 @@ class CompanyInvitationPolicy
             return true;
         }
 
-        // San Pietro (main company) può modificare tutti gli inviti
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può modificare tutti gli inviti
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 
@@ -76,8 +76,8 @@ class CompanyInvitationPolicy
             return true;
         }
 
-        // San Pietro (main company) può eliminare tutti gli inviti
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può eliminare tutti gli inviti
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 

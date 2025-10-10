@@ -10,29 +10,34 @@ class UserPolicy
     {
         if (
             $user->hasRole('SUPER_ADMIN') ||
-            ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain())
+            ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro())
         ) {
             return true;
         }
-        return $user->hasPermissionTo('view users');
+
+        // Altri COMPANY_ADMIN possono vedere utenti solo se hanno il permesso
+        if ($user->hasRole('COMPANY_ADMIN')) {
+            return $user->hasPermissionTo('view users');
+        }
+
+        return false;
     }
 
     public function view(User $user, User $model): bool
     {
-        // if ($user->hasRole('SUPER_ADMIN')) {
-        //     return true;
-        // }
-        if (
-            $user->hasRole('SUPER_ADMIN') ||
-            ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain())
-        ) {
+        if ($user->hasRole('SUPER_ADMIN')) {
             return true;
         }
 
-        // Company admin può vedere gli utenti della sua company e delle child companies
+        // San Pietro può vedere TUTTI gli utenti
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
+            return true;
+        }
+
+        // Altri Company admin possono vedere gli utenti della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $model->company_id ||
-                ($model->company && $model->company->parent_company_id === $user->company_id);
+                $model->company?->parent_company_id === $user->company_id;
         }
 
         // Gli altri utenti possono vedere solo il proprio profilo
@@ -50,10 +55,15 @@ class UserPolicy
             return true;
         }
 
-        // Company admin può modificare gli utenti della sua company e delle child companies
+        // San Pietro può modificare TUTTI gli utenti
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
+            return true;
+        }
+
+        // Altri Company admin possono modificare gli utenti della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $model->company_id ||
-                ($model->company && $model->company->parent_company_id === $user->company_id);
+                $model->company?->parent_company_id === $user->company_id;
         }
 
         // Gli altri utenti possono modificare solo il proprio profilo
@@ -66,9 +76,14 @@ class UserPolicy
             return true;
         }
 
-        // Company admin può eliminare gli utenti delle child companies, ma non quelli della propria company
+        // San Pietro può eliminare TUTTI gli utenti (tranne se stesso)
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
+            return $user->id !== $model->id; // Non può eliminare se stesso
+        }
+
+        // Altri Company admin possono eliminare gli utenti delle child companies, ma non quelli della propria company
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $model->company && $model->company->parent_company_id === $user->company_id;
+            return $model->company?->parent_company_id === $user->company_id;
         }
 
         return false;

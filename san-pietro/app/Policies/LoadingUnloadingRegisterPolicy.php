@@ -22,9 +22,9 @@ class LoadingUnloadingRegisterPolicy
 
         // COMPANY_ADMIN (San Pietro) può vedere i registri della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 $canView = $user->company_id === $register->company_id ||
-                          ($register->company && $register->company->parent_company_id === $user->company_id);
+                          $register->company?->parent_company_id === $user->company_id;
 
                 \Log::info('LoadingUnloadingPolicy view: San Pietro', [
                     'user_company_id' => $user->company_id,
@@ -71,10 +71,10 @@ class LoadingUnloadingRegisterPolicy
 
         // COMPANY_ADMIN può modificare i propri registri
         if ($user->hasRole('COMPANY_ADMIN')) {
-            // San Pietro (main company) può modificare tutti i registri
-            if ($user->company && $user->company->isMain()) {
+            // San Pietro può modificare tutti i registri
+            if ($user->company?->isSanPietro()) {
                 $canModify = $user->company_id === $register->company_id ||
-                            ($register->company && $register->company->parent_company_id === $user->company_id);
+                            $register->company?->parent_company_id === $user->company_id;
 
                 Log::info('LoadingUnloadingPolicy update: San Pietro', [
                     'user_company_id' => $user->company_id,
@@ -101,10 +101,10 @@ class LoadingUnloadingRegisterPolicy
 
         // COMPANY_ADMIN può eliminare i propri registri
         if ($user->hasRole('COMPANY_ADMIN')) {
-            // San Pietro (main company) può eliminare tutti i registri
-            if ($user->company && $user->company->isMain()) {
+            // San Pietro può eliminare tutti i registri
+            if ($user->company?->isSanPietro()) {
                 $canDelete = $user->company_id === $register->company_id ||
-                            ($register->company && $register->company->parent_company_id === $user->company_id);
+                            $register->company?->parent_company_id === $user->company_id;
 
                 Log::info('LoadingUnloadingPolicy delete: San Pietro', [
                     'user_company_id' => $user->company_id,

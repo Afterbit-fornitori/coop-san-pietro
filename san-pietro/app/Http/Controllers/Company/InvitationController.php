@@ -20,10 +20,10 @@ class InvitationController extends Controller
             /** @var User $user */
             $user = auth()->user();
 
-            // SUPER_ADMIN o San Pietro (main company) possono invitare altre aziende
+            // SUPER_ADMIN o San Pietro (azienda proprietaria) possono invitare altre aziende
             if (
                 !$user->hasRole('SUPER_ADMIN') &&
-                (!$user->hasRole('COMPANY_ADMIN') || !$user->company->isMain())
+                (!$user->hasRole('COMPANY_ADMIN') || !$user->company?->isSanPietro())
             ) {
                 abort(403, 'Solo il SUPER_ADMIN o San Pietro possono inviare inviti ad altre aziende.');
             }
@@ -39,7 +39,7 @@ class InvitationController extends Controller
 
         // San Pietro (proprietario piattaforma) vede TUTTI gli inviti
         // Gli inviti vengono creati automaticamente quando si crea un'azienda in Admin\CompanyController
-        if ($user->hasRole('SUPER_ADMIN') || ($user->company && $user->company->isMain())) {
+        if ($user->hasRole('SUPER_ADMIN') || $user->company?->isSanPietro()) {
             $invitations = CompanyInvitation::with('invitedCompany')
                 ->orderBy('created_at', 'desc')
                 ->get();

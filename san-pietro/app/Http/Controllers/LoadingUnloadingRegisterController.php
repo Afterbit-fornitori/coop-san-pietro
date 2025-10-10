@@ -23,7 +23,7 @@ class LoadingUnloadingRegisterController extends Controller
         // Filtra in base al ruolo
         if ($user->hasRole('SUPER_ADMIN')) {
             // SUPER_ADMIN vede tutto
-        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             // San Pietro vede i propri registri + quelli delle aziende invitate
             $query->where(function($q) use ($user) {
                 $q->where('company_id', $user->company_id)

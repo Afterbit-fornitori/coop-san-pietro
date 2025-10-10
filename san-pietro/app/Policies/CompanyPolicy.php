@@ -18,15 +18,15 @@ class CompanyPolicy
             return true;
         }
 
-        // San Pietro (PROPRIETARIO - main company) può vedere TUTTE le aziende
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro (PROPRIETARIO) può vedere TUTTE le aziende
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 
         // Altri Company admin possono vedere la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->id ||
-                $user->company_id === $company->parent_company_id;
+                $company->parent_company_id === $user->company_id;
         }
 
         // Company user può vedere solo la propria company
@@ -40,8 +40,8 @@ class CompanyPolicy
             return true;
         }
 
-        // COMPANY_ADMIN di San Pietro (PROPRIETARIO - main) può creare qualsiasi tipo di azienda
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // COMPANY_ADMIN di San Pietro (PROPRIETARIO) può creare qualsiasi tipo di azienda
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 
@@ -59,15 +59,15 @@ class CompanyPolicy
             return true;
         }
 
-        // San Pietro (PROPRIETARIO - main company) può modificare TUTTE le aziende
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro (PROPRIETARIO) può modificare TUTTE le aziende
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return true;
         }
 
         // Altri Company admin possono modificare la propria company e le sue child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
             return $user->company_id === $company->id ||
-                $user->company_id === $company->parent_company_id;
+                $company->parent_company_id === $user->company_id;
         }
 
         return false;
@@ -79,14 +79,14 @@ class CompanyPolicy
             return true;
         }
 
-        // San Pietro (PROPRIETARIO - main company) può eliminare TUTTE le aziende (tranne se stessa)
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro (PROPRIETARIO) può eliminare TUTTE le aziende (tranne se stessa)
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             return $user->company_id !== $company->id; // Non può eliminare se stesso
         }
 
-        // Altri Company admin possono eliminare solo le sue child companies (non se stessa)
+        // Altri Company admin possono eliminare solo le proprie child companies (non se stessa)
         if ($user->hasRole('COMPANY_ADMIN')) {
-            return $user->company_id === $company->parent_company_id;
+            return $company->parent_company_id === $user->company_id;
         }
 
         return false;
@@ -94,7 +94,7 @@ class CompanyPolicy
 
     public function invite(User $user, Company $company): bool
     {
-        return $user->hasPermissionTo('invite_companies') &&
+        return $user->hasPermissionTo('invite companies') &&
             $user->company_id === $company->id;
     }
 }

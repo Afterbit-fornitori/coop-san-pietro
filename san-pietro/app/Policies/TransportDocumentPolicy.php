@@ -20,10 +20,10 @@ class TransportDocumentPolicy
 
         // COMPANY_ADMIN (San Pietro) può vedere i documenti della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 // San Pietro può vedere i propri documenti e quelli delle aziende invitate
                 return $user->company_id === $document->company_id ||
-                       ($document->company && $document->company->parent_company_id === $user->company_id);
+                       $document->company?->parent_company_id === $user->company_id;
             }
 
             // Altri COMPANY_ADMIN possono vedere solo i propri documenti

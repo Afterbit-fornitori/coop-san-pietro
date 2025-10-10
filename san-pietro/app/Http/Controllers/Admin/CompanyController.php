@@ -46,7 +46,7 @@ class CompanyController extends Controller
                 ->with(['parentCompany', 'childCompanies'])
                 ->orderBy('created_at', 'desc')
                 ->get();
-        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             // San Pietro (PROPRIETARIO della piattaforma) vede TUTTE le aziende
             // Può crearle, modificarle e gestirle tutte, anche quelle con parent diversi
             $companies = Company::withCount('users')
@@ -54,10 +54,11 @@ class CompanyController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-            // Altri COMPANY_ADMIN vedono solo la propria azienda
+            // Altri COMPANY_ADMIN vedono solo la propria azienda + sub-aziende assegnate
+            $accessibleCompanyIds = $user->getAccessibleCompanies()->pluck('id');
             $companies = Company::withCount('users')
                 ->with(['parentCompany', 'childCompanies'])
-                ->where('id', $user->company_id)
+                ->whereIn('id', $accessibleCompanyIds)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
@@ -76,13 +77,14 @@ class CompanyController extends Controller
             // SUPER_ADMIN può vedere tutte le aziende come possibili parent
             $parentCompanies = Company::orderBy('name')->get();
             $allowedTypes = ['main', 'invited'];
-        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             // San Pietro (PROPRIETARIO) può creare qualsiasi tipo di azienda
             // Vede tutte le aziende esistenti come possibili parent
             $parentCompanies = Company::orderBy('name')->get();
             $allowedTypes = ['main', 'invited'];
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
-            // Altri COMPANY_ADMIN possono creare solo aziende figlie della propria
+            // Altri COMPANY_ADMIN possono creare solo aziende figlie (invited)
+            // Vedono solo la propria azienda come parent disponibile
             $parentCompanies = Company::where('id', $user->company_id)->get();
             $allowedTypes = ['invited'];
         }
@@ -102,7 +104,7 @@ class CompanyController extends Controller
             $allowedTypes = ['main', 'invited'];
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
             // COMPANY_ADMIN può creare aziende
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 // San Pietro (PROPRIETARIO) può creare tutti i tipi di aziende
                 $allowedTypes = ['main', 'invited'];
             } else {
@@ -138,10 +140,10 @@ class CompanyController extends Controller
             // Logica di autorizzazione per la creazione
             if (!$user->hasRole('SUPER_ADMIN')) {
                 if ($user->hasRole('COMPANY_ADMIN')) {
-                    // San Pietro (PROPRIETARIO - main) può creare qualsiasi tipo senza restrizioni
-                    if ($user->company && $user->company->isMain()) {
-                        // San Pietro può creare aziende main o invited
-                        // Nessuna restrizione sul parent_company_id
+                    // San Pietro (PROPRIETARIO) può creare qualsiasi tipo senza restrizioni
+                    if ($user->company?->isSanPietro()) {
+                        // San Pietro può creare aziende main o invited con qualsiasi parent
+                        // Nessuna restrizione
                     } else {
                         // Altri COMPANY_ADMIN possono creare solo invited come figlie
                         if ($validated['type'] !== 'invited') {
@@ -275,15 +277,19 @@ class CompanyController extends Controller
                 ->orderBy('name')
                 ->get();
             $allowedTypes = ['main', 'invited'];
-        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             // San Pietro vede tutte le aziende tranne quella corrente
             $parentCompanies = Company::where('id', '!=', $company->id)
                 ->orderBy('name')
                 ->get();
             $allowedTypes = ['main', 'invited'];
         } elseif ($user->hasRole('COMPANY_ADMIN')) {
-            // Altri COMPANY_ADMIN vedono solo la propria azienda come parent
-            $parentCompanies = Company::where('id', $user->company_id)->get();
+            // Altri COMPANY_ADMIN vedono solo aziende accessibili come parent
+            $accessibleCompanyIds = $user->getAccessibleCompanies()->pluck('id');
+            $parentCompanies = Company::whereIn('id', $accessibleCompanyIds)
+                ->where('id', '!=', $company->id)
+                ->orderBy('name')
+                ->get();
             $allowedTypes = ['invited'];
         }
 
@@ -299,7 +305,7 @@ class CompanyController extends Controller
         $allowedTypes = [];
         if ($user->hasRole('SUPER_ADMIN')) {
             $allowedTypes = ['main', 'invited'];
-        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        } elseif ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             // San Pietro può modificare qualsiasi tipo
             $allowedTypes = ['main', 'invited'];
         } else {

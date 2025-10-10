@@ -150,6 +150,13 @@ class Company extends Tenant
         return in_array($this->type, ['master', 'main']);
     }
 
+    // Verifica se è San Pietro (azienda proprietaria della piattaforma)
+    public function isSanPietro(): bool
+    {
+        // San Pietro è l'azienda di tipo master/main SENZA parent
+        return $this->isMain() && $this->parent_company_id === null;
+    }
+
     // Verifica se è un'azienda invitata
     public function isInvited(): bool
     {

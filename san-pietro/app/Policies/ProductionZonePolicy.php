@@ -20,10 +20,10 @@ class ProductionZonePolicy
 
         // COMPANY_ADMIN (San Pietro) può vedere le zone della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 // San Pietro può vedere le proprie zone e quelle delle aziende invitate
                 return $user->company_id === $productionZone->company_id ||
-                    ($productionZone->company && $productionZone->company->parent_company_id === $user->company_id);
+                    $productionZone->company?->parent_company_id === $user->company_id;
             }
 
             // Altri COMPANY_ADMIN possono vedere solo le proprie zone
@@ -45,10 +45,10 @@ class ProductionZonePolicy
             return true;
         }
 
-        // San Pietro (main company) può modificare le zone delle proprie aziende e quelle invitate
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può modificare le zone delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             $canModify = $user->company_id === $productionZone->company_id ||
-                ($productionZone->company && $productionZone->company->parent_company_id === $user->company_id);
+                $productionZone->company?->parent_company_id === $user->company_id;
             return $canModify && $user->hasPermissionTo('edit production zones');
         }
 
@@ -63,10 +63,10 @@ class ProductionZonePolicy
             return true;
         }
 
-        // San Pietro (main company) può eliminare le zone delle proprie aziende e quelle invitate
-        if ($user->hasRole('COMPANY_ADMIN') && $user->company && $user->company->isMain()) {
+        // San Pietro può eliminare le zone delle proprie aziende e quelle invitate
+        if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
             $canDelete = $user->company_id === $productionZone->company_id ||
-                ($productionZone->company && $productionZone->company->parent_company_id === $user->company_id);
+                $productionZone->company?->parent_company_id === $user->company_id;
             return $canDelete && $user->hasPermissionTo('delete production zones');
         }
 

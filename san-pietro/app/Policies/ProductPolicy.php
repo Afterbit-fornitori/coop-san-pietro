@@ -20,9 +20,9 @@ class ProductPolicy
 
         // COMPANY_ADMIN (San Pietro) può vedere i prodotti della propria company e delle child companies
         if ($user->hasRole('COMPANY_ADMIN')) {
-            if ($user->company && $user->company->isMain()) {
+            if ($user->company?->isSanPietro()) {
                 return $user->company_id === $product->company_id ||
-                       ($product->company && $product->company->parent_company_id === $user->company_id);
+                       $product->company?->parent_company_id === $user->company_id;
             }
 
             return $user->company_id === $product->company_id;
