@@ -173,6 +173,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/transport-documents/{transport_document}/pdf', [TransportDocumentController::class, 'viewPdf'])->name('transport-documents.pdf.view');
         Route::get('/transport-documents/{transport_document}/pdf/download', [TransportDocumentController::class, 'downloadPdf'])->name('transport-documents.pdf.download');
 
+        // Cestino DDT
+        Route::get('/transport-documents-trashed', [TransportDocumentController::class, 'trashed'])->name('transport-documents.trashed');
+        Route::post('/transport-documents/{id}/restore', [TransportDocumentController::class, 'restore'])->name('transport-documents.restore');
+        Route::delete('/transport-documents/{id}/force-delete', [TransportDocumentController::class, 'forceDestroy'])->name('transport-documents.force-destroy');
+
         // Gestione Items (Prodotti) di Documenti di Trasporto (AJAX)
         Route::post('/transport-document-items', [TransportDocumentItemController::class, 'store'])->name('transport-document-items.store');
         Route::delete('/transport-document-items/{transport_document_item}', [TransportDocumentItemController::class, 'destroy'])->name('transport-document-items.destroy');

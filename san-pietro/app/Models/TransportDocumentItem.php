@@ -48,5 +48,10 @@ class TransportDocumentItem extends Model
             // Aggiorna i totali del documento padre
             $item->transportDocument->calcolaTotali();
         });
+
+        static::deleted(function ($item) {
+            // Aggiorna i totali del documento padre anche quando viene eliminato un item
+            $item->transportDocument->calcolaTotali();
+        });
     }
 }

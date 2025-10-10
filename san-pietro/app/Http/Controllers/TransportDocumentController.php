@@ -116,10 +116,51 @@ class TransportDocumentController extends Controller
 
     public function destroy(TransportDocument $transportDocument)
     {
-        $transportDocument->delete();
+        $transportDocument->delete(); // Soft delete
 
         return redirect()->route('transport-documents.index')
-            ->with('success', 'Documento di trasporto eliminato con successo.');
+            ->with('success', 'Documento di trasporto spostato nel cestino.');
+    }
+
+    /**
+     * Visualizza il cestino dei documenti eliminati
+     */
+    public function trashed()
+    {
+        $trashedDocuments = TransportDocument::onlyTrashed()
+            ->with(['client', 'member', 'productionZone'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(15);
+
+        return view('transport-documents.trashed', compact('trashedDocuments'));
+    }
+
+    /**
+     * Ripristina un documento dal cestino
+     */
+    public function restore($id)
+    {
+        $transportDocument = TransportDocument::onlyTrashed()->findOrFail($id);
+        $this->authorize('update', $transportDocument);
+
+        $transportDocument->restore();
+
+        return redirect()->route('transport-documents.trashed')
+            ->with('success', 'Documento ripristinato con successo.');
+    }
+
+    /**
+     * Elimina definitivamente un documento dal cestino
+     */
+    public function forceDestroy($id)
+    {
+        $transportDocument = TransportDocument::onlyTrashed()->findOrFail($id);
+        $this->authorize('delete', $transportDocument);
+
+        $transportDocument->forceDelete();
+
+        return redirect()->route('transport-documents.trashed')
+            ->with('success', 'Documento eliminato definitivamente.');
     }
 
     /**
