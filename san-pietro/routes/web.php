@@ -119,6 +119,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
     });
 
+    Route::middleware(['role:COMPANY_ADMIN', 'tenant', 'multitenancy.group', 'can:viewAny,App\Models\Invitation'])->group(function () {
+        Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
+        Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
+        Route::post('/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
+        Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
+    });
+
     // ==============================================
     // AREA OPERATIVA - COMPANY_ADMIN | COMPANY_USER
     // ==============================================
