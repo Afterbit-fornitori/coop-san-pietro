@@ -23,6 +23,9 @@
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                         {{ __('Utenti') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
+                        {{ __('Inviti') }}
+                    </x-nav-link>
                     @endif
 
                     @if(auth()->user()->hasRole('COMPANY_ADMIN'))
@@ -32,9 +35,11 @@
                     <x-nav-link :href="route('company.users.index')" :active="request()->routeIs('company.users.*')">
                         {{ __('Utenti') }}
                     </x-nav-link>
+                    @if(auth()->user()->company?->isSanPietro())
                     <x-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
                         {{ __('Inviti') }}
                     </x-nav-link>
+                    @endif
                     @endif
 
                     @if(auth()->user()->hasRole(['COMPANY_ADMIN', 'COMPANY_USER']))
@@ -123,12 +128,23 @@
             <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                 {{ __('Utenti') }}
             </x-responsive-nav-link>
-            @endif
-
-            @if(auth()->user()->hasRole('COMPANY_ADMIN'))
             <x-responsive-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
                 {{ __('Inviti') }}
             </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->hasRole('COMPANY_ADMIN'))
+            <x-responsive-nav-link :href="route('company.companies.index')" :active="request()->routeIs('company.companies.*')">
+                {{ __('Aziende') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('company.users.index')" :active="request()->routeIs('company.users.*')">
+                {{ __('Utenti') }}
+            </x-responsive-nav-link>
+            @if(auth()->user()->company?->isSanPietro())
+            <x-responsive-nav-link :href="route('company.invitations.index')" :active="request()->routeIs('company.invitations.*')">
+                {{ __('Inviti') }}
+            </x-responsive-nav-link>
+            @endif
             @endif
 
             @if(auth()->user()->hasRole(['COMPANY_ADMIN', 'COMPANY_USER']))

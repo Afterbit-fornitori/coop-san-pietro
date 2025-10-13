@@ -203,10 +203,34 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $user->delete();
+        try {
+            // La policy si occupa dell'autorizzazione tramite authorizeResource
 
-        return redirect()->route($this->getRoutePrefix() . '.users.index')
-            ->with('success', 'Utente eliminato con successo.');
+            // Verifica che l'utente non stia eliminando se stesso
+            if ($user->id === auth()->id()) {
+                return back()->withErrors(['error' => 'Non puoi eliminare il tuo account mentre sei connesso.']);
+            }
+
+            // Verifica se l'utente è l'ultimo SUPER_ADMIN
+            if ($user->hasRole('SUPER_ADMIN')) {
+                $superAdminsCount = User::role('SUPER_ADMIN')->count();
+                if ($superAdminsCount <= 1) {
+                    return back()->withErrors(['error' => 'Non puoi eliminare l\'ultimo Super Admin del sistema.']);
+                }
+            }
+
+            $userName = $user->name;
+            $user->delete();
+
+            return redirect()->route($this->getRoutePrefix() . '.users.index')
+                ->with('success', "Utente '{$userName}' eliminato con successo.");
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return back()->withErrors(['error' => 'Non hai i permessi per eliminare questo utente.']);
+        } catch (\Exception $e) {
+            \Log::error("Errore durante l'eliminazione dell'utente {$user->name}: " . $e->getMessage());
+            return back()->withErrors(['error' => "Errore durante l'eliminazione: " . $e->getMessage()]);
+        }
     }
 
     public function toggleStatus(User $user)

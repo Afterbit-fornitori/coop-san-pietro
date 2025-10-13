@@ -102,6 +102,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit companies',
             'invite companies',
 
+
             // Gestione utenti della propria azienda e aziende invitate
             'view users',
             'create users',

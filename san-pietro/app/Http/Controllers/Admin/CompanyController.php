@@ -223,20 +223,40 @@ class CompanyController extends Controller
                     ->first();
 
                 if (!$existingInvitation) {
-                    $invitation = CompanyInvitation::create([
-                        'inviter_company_id' => $user->company_id, // L'azienda che crea l'invito (San Pietro)
-                        'invited_company_id' => $company->id, // ID dell'azienda appena creata
-                        'company_name' => $validated['name'],
-                        'email' => $validated['email'],
-                        'business_type' => $validated['business_type'] ?? null,
-                        'sector' => $validated['sector'] ?? null,
-                        'permissions' => ['members', 'productions', 'documents', 'reports'], // Tutti i permessi
-                        'token' => Str::random(64),
-                        'status' => 'pending', // PENDING: cambierà ad 'accepted' al primo login
-                        'expires_at' => now()->addDays(30),
-                    ]);
+                    // Determina inviter_company_id:
+                    // - SUPER_ADMIN: usa San Pietro (prima azienda main senza parent) o NULL se non esiste
+                    // - San Pietro: usa il proprio ID
+                    // - Altri COMPANY_ADMIN: usa il proprio company_id
+                    $inviterCompanyId = null;
+                    if ($user->hasRole('SUPER_ADMIN')) {
+                        // Cerca San Pietro (main senza parent)
+                        $sanPietro = Company::where('type', 'main')
+                            ->whereNull('parent_company_id')
+                            ->first();
+                        $inviterCompanyId = $sanPietro ? $sanPietro->id : null;
+                    } else {
+                        $inviterCompanyId = $user->company_id;
+                    }
 
-                    Log::info("Invito tracciamento creato per azienda {$company->name} - Status: pending (cambierà ad accepted al login)");
+                    // Crea l'invito solo se abbiamo un inviter valido
+                    if ($inviterCompanyId) {
+                        $invitation = CompanyInvitation::create([
+                            'inviter_company_id' => $inviterCompanyId,
+                            'invited_company_id' => $company->id, // ID dell'azienda appena creata
+                            'company_name' => $validated['name'],
+                            'email' => $validated['email'],
+                            'business_type' => $validated['business_type'] ?? null,
+                            'sector' => $validated['sector'] ?? null,
+                            'permissions' => ['members', 'productions', 'documents', 'reports'], // Tutti i permessi
+                            'token' => Str::random(64),
+                            'status' => 'pending', // PENDING: cambierà ad 'accepted' al primo login
+                            'expires_at' => now()->addDays(30),
+                        ]);
+
+                        Log::info("Invito tracciamento creato per azienda {$company->name} - Status: pending (cambierà ad accepted al login)");
+                    } else {
+                        Log::warning("Impossibile creare invito per {$company->name}: nessun inviter valido trovato");
+                    }
                 }
             }
 
@@ -340,27 +360,51 @@ class CompanyController extends Controller
 
     public function destroy(Company $company)
     {
-        // Solo SUPER_ADMIN può eliminare aziende
-        /** @var User $user */
-        $user = auth()->user();
-        if (!$user->hasRole('SUPER_ADMIN')) {
-            abort(403, 'Solo il Super Admin può eliminare aziende.');
+        try {
+            // La policy si occupa dell'autorizzazione tramite authorizeResource
+
+            // Controlla se ci sono utenti collegati
+            $usersCount = $company->users()->count();
+            if ($usersCount > 0) {
+                return back()->withErrors(['error' => "Impossibile eliminare l'azienda '{$company->name}': ci sono {$usersCount} utenti associati. Elimina prima gli utenti."]);
+            }
+
+            // Controlla se ci sono membri (soci) collegati
+            $membersCount = $company->members()->count();
+            if ($membersCount > 0) {
+                return back()->withErrors(['error' => "Impossibile eliminare l'azienda '{$company->name}': ci sono {$membersCount} soci associati. Elimina prima i soci."]);
+            }
+
+            // Controlla se ci sono aziende figlie (sub-aziende)
+            $childCompaniesCount = $company->childCompanies()->count();
+            if ($childCompaniesCount > 0) {
+                return back()->withErrors(['error' => "Impossibile eliminare l'azienda '{$company->name}': ci sono {$childCompaniesCount} aziende figlie associate. Elimina prima le aziende figlie."]);
+            }
+
+            // Controlla se ci sono clienti collegati
+            $clientsCount = $company->clients()->count();
+            if ($clientsCount > 0) {
+                return back()->withErrors(['error' => "Impossibile eliminare l'azienda '{$company->name}': ci sono {$clientsCount} clienti associati. Elimina prima i clienti."]);
+            }
+
+            // Controlla se ci sono prodotti collegati
+            $productsCount = $company->products()->count();
+            if ($productsCount > 0) {
+                return back()->withErrors(['error' => "Impossibile eliminare l'azienda '{$company->name}': ci sono {$productsCount} prodotti associati. Elimina prima i prodotti."]);
+            }
+
+            $companyName = $company->name;
+            $company->delete();
+
+            return redirect()->route($this->getRoutePrefix() . '.companies.index')
+                ->with('success', "Azienda '{$companyName}' eliminata con successo.");
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return back()->withErrors(['error' => 'Non hai i permessi per eliminare questa azienda.']);
+        } catch (\Exception $e) {
+            Log::error("Errore durante l'eliminazione dell'azienda {$company->name}: " . $e->getMessage());
+            return back()->withErrors(['error' => "Errore durante l'eliminazione: " . $e->getMessage()]);
         }
-
-        // Controlla se ci sono utenti o dati collegati
-        if ($company->users()->count() > 0) {
-            return back()->withErrors(['error' => 'Impossibile eliminare: azienda con utenti associati.']);
-        }
-
-        if ($company->members()->count() > 0) {
-            return back()->withErrors(['error' => 'Impossibile eliminare: azienda con membri associati.']);
-        }
-
-        $companyName = $company->name;
-        $company->delete();
-
-        return redirect()->route($this->getRoutePrefix() . '.companies.index')
-            ->with('success', "Azienda '{$companyName}' eliminata con successo.");
     }
 
     public function show(Company $company)

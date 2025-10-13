@@ -7,6 +7,7 @@ use App\Mail\CompanyAdminCreatedMail;
 use App\Models\CompanyInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -18,24 +19,27 @@ class InvitationController extends Controller
     {
         $this->middleware(function ($request, $next) {
             /** @var User $user */
-            $user = auth()->user();
+            $user = Auth::user();
 
-            // SUPER_ADMIN o San Pietro (azienda proprietaria) possono invitare altre aziende
-            if (
-                !$user->hasRole('SUPER_ADMIN') &&
-                (!$user->hasRole('COMPANY_ADMIN') || !$user->company?->isSanPietro())
-            ) {
-                abort(403, 'Solo il SUPER_ADMIN o San Pietro possono inviare inviti ad altre aziende.');
+            // SUPER_ADMIN: ha sempre accesso
+            if ($user->hasRole('SUPER_ADMIN')) {
+                return $next($request);
             }
 
-            return $next($request);
+            // San Pietro (COMPANY_ADMIN della piattaforma proprietaria): ha accesso
+            if ($user->hasRole('COMPANY_ADMIN') && $user->company?->isSanPietro()) {
+                return $next($request);
+            }
+
+            // Tutti gli altri: accesso negato
+            abort(403, 'Solo il SUPER_ADMIN o San Pietro possono gestire gli inviti.');
         });
     }
 
     public function index()
     {
         /** @var User $user */
-        $user = auth()->user();
+        $user = Auth::user();
 
         // San Pietro (proprietario piattaforma) vede TUTTI gli inviti
         // Gli inviti vengono creati automaticamente quando si crea un'azienda in Admin\CompanyController
@@ -65,7 +69,7 @@ class InvitationController extends Controller
 
         // Trova l'utente admin dell'azienda invitata
         $admin = User::where('company_id', $invitation->invited_company_id)
-            ->whereHas('roles', function($q) {
+            ->whereHas('roles', function ($q) {
                 $q->where('name', 'COMPANY_ADMIN');
             })
             ->first();
