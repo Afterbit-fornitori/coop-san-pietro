@@ -140,10 +140,16 @@ class CompanyController extends Controller
             // Logica di autorizzazione per la creazione
             if (!$user->hasRole('SUPER_ADMIN')) {
                 if ($user->hasRole('COMPANY_ADMIN')) {
-                    // San Pietro (PROPRIETARIO) può creare qualsiasi tipo senza restrizioni
+                    // San Pietro (PROPRIETARIO) può creare qualsiasi tipo
                     if ($user->company?->isSanPietro()) {
-                        // San Pietro può creare aziende main o invited con qualsiasi parent
-                        // Nessuna restrizione
+                        // Se San Pietro crea un'azienda type='main', DEVE avere parent_id = San Pietro
+                        if ($validated['type'] === 'main') {
+                            $validated['parent_company_id'] = $user->company_id; // Parent obbligatorio = San Pietro
+                        }
+                        // Per invited, può scegliere il parent o usare se stesso come default
+                        if ($validated['type'] === 'invited' && empty($validated['parent_company_id'])) {
+                            $validated['parent_company_id'] = $user->company_id;
+                        }
                     } else {
                         // Altri COMPANY_ADMIN possono creare solo invited come figlie
                         if ($validated['type'] !== 'invited') {
@@ -156,6 +162,16 @@ class CompanyController extends Controller
                         }
                         $validated['parent_company_id'] = $user->company_id;
                     }
+                }
+            } else {
+                // SUPER_ADMIN: Se crea type='main', verificare se è San Pietro (prima azienda)
+                if ($validated['type'] === 'main') {
+                    $existingSanPietro = Company::where('type', 'main')->whereNull('parent_company_id')->first();
+                    if ($existingSanPietro && empty($validated['parent_company_id'])) {
+                        // Esiste già San Pietro, quindi questa Main DEVE avere un parent
+                        throw new \Exception('Esiste già l\'azienda principale (San Pietro). Le altre aziende Main devono avere un parent_company_id.');
+                    }
+                    // Se parent_company_id è vuoto e non esiste San Pietro, allora QUESTA è San Pietro
                 }
             }
 
@@ -398,7 +414,6 @@ class CompanyController extends Controller
 
             return redirect()->route($this->getRoutePrefix() . '.companies.index')
                 ->with('success', "Azienda '{$companyName}' eliminata con successo.");
-
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             return back()->withErrors(['error' => 'Non hai i permessi per eliminare questa azienda.']);
         } catch (\Exception $e) {

@@ -154,7 +154,21 @@ class Company extends Tenant
     public function isSanPietro(): bool
     {
         // San Pietro è l'azienda di tipo master/main SENZA parent
-        return $this->isMain() && $this->parent_company_id === null;
+        $isMain = $this->isMain();
+        $hasNoParent = $this->parent_company_id === null;
+        $result = $isMain && $hasNoParent;
+
+        \Log::info('Company::isSanPietro() check', [
+            'company_id' => $this->id,
+            'company_name' => $this->name,
+            'type' => $this->type,
+            'parent_company_id' => $this->parent_company_id,
+            'isMain' => $isMain,
+            'hasNoParent' => $hasNoParent,
+            'isSanPietro' => $result
+        ]);
+
+        return $result;
     }
 
     // Verifica se è un'azienda invitata

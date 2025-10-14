@@ -41,8 +41,8 @@
                             <div>
                                 <label for="member_id" class="block text-sm font-medium text-gray-700">Socio *</label>
                                 <select id="member_id" name="member_id"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        required {{ $members->isEmpty() ? 'disabled' : '' }}>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required {{ $members->isEmpty() ? 'disabled' : '' }}>
                                     <option value="">Seleziona Socio</option>
                                     @foreach($members as $member)
                                     <option value="{{ $member->id }}" {{ old('member_id') == $member->id ? 'selected' : '' }}>
@@ -56,16 +56,16 @@
                             <div>
                                 <label for="year" class="block text-sm font-medium text-gray-700">Anno *</label>
                                 <input type="number" id="year" name="year" value="{{ old('year', date('Y')) }}" min="2020" max="2030"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required>
                                 @error('year')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
 
                             <div>
                                 <label for="week" class="block text-sm font-medium text-gray-700">Settimana *</label>
                                 <input type="number" id="week" name="week" value="{{ old('week', date('W')) }}" min="1" max="53"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required>
                                 @error('week')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -74,23 +74,23 @@
                             <div>
                                 <label for="start_date" class="block text-sm font-medium text-gray-700">Data Inizio *</label>
                                 <input type="date" id="start_date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required>
                                 @error('start_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
 
                             <div>
                                 <label for="end_date" class="block text-sm font-medium text-gray-700">Data Fine *</label>
                                 <input type="date" id="end_date" name="end_date" value="{{ old('end_date', date('Y-m-d')) }}"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       required>
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    required>
                                 @error('end_date')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
 
                             <div>
                                 <label for="invoice_number" class="block text-sm font-medium text-gray-700">Numero Fattura</label>
                                 <input type="text" id="invoice_number" name="invoice_number" value="{{ old('invoice_number') }}"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 @error('invoice_number')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -108,14 +108,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_micro_internal_reimmersion"
-                                               value="{{ old('kg_micro_internal_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_micro_internal_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_micro_internal_reimmersion"
-                                               value="{{ old('price_micro_internal_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_micro_internal_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -127,14 +127,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_small_internal_reimmersion"
-                                               value="{{ old('kg_small_internal_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_small_internal_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_small_internal_reimmersion"
-                                               value="{{ old('price_small_internal_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_small_internal_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -153,14 +153,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_micro_resale_reimmersion"
-                                               value="{{ old('kg_micro_resale_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_micro_resale_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_micro_resale_reimmersion"
-                                               value="{{ old('price_micro_resale_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_micro_resale_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -172,14 +172,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_small_resale_reimmersion"
-                                               value="{{ old('kg_small_resale_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_small_resale_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_small_resale_reimmersion"
-                                               value="{{ old('price_small_resale_reimmersion', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_small_resale_reimmersion', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -198,14 +198,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_medium_consumption"
-                                               value="{{ old('kg_medium_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_medium_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_medium_consumption"
-                                               value="{{ old('price_medium_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_medium_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -217,14 +217,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_large_consumption"
-                                               value="{{ old('kg_large_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_large_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_large_consumption"
-                                               value="{{ old('price_large_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_large_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -236,14 +236,14 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Kg</label>
                                         <input type="number" step="0.01" name="kg_super_consumption"
-                                               value="{{ old('kg_super_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('kg_super_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Prezzo €/kg</label>
                                         <input type="number" step="0.01" name="price_super_consumption"
-                                               value="{{ old('price_super_consumption', 0) }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            value="{{ old('price_super_consumption', 0) }}"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                 </div>
                             </div>
@@ -251,7 +251,7 @@
                     </div>
 
                     <!-- Calcoli (opzionali - calcolati automaticamente dal backend) -->
-                    <div class="bg-yellow-50 p-6 rounded-lg">
+                    <!-- <div class="bg-yellow-50 p-6 rounded-lg">
                         <h3 class="text-lg font-semibold mb-4 border-b border-yellow-200 pb-2">Calcoli Bonifico (Opzionali)</h3>
                         <p class="text-sm text-gray-600 mb-4">Questi campi possono essere lasciati a 0 se non disponibili. Verranno calcolati automaticamente se necessario.</p>
 
@@ -286,17 +286,17 @@
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Pulsanti -->
                     <div class="flex justify-end space-x-3 pt-6 border-t">
                         <a href="{{ route('weekly-records.index') }}"
-                           class="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                            class="px-6 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
                             Annulla
                         </a>
                         <button type="submit"
-                                class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                {{ $members->isEmpty() ? 'disabled' : '' }}>
+                            class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            {{ $members->isEmpty() ? 'disabled' : '' }}>
                             Crea Registro
                         </button>
                     </div>

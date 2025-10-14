@@ -110,16 +110,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'destroy' => 'users.destroy',
         ]);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-
-        // Gestione Inviti (solo COMPANY_ADMIN) - SOLO VISUALIZZAZIONE e GESTIONE
-        // Gli inviti vengono creati automaticamente in Admin\CompanyController
-        Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
-        Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
-        Route::post('/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
-        Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
     });
 
-    Route::middleware(['role:COMPANY_ADMIN', 'tenant', 'multitenancy.group', 'can:viewAny,App\Models\Invitation'])->group(function () {
+    // ==============================================
+    // GESTIONE INVITI - Solo SUPER_ADMIN e San Pietro
+    // ==============================================
+    // Gruppo separato per gli inviti accessibile SOLO a SUPER_ADMIN e San Pietro (COMPANY_ADMIN proprietario piattaforma)
+    // Gli inviti vengono creati automaticamente quando si crea un'azienda invited in Admin\CompanyController
+    // NOTA: Nessun middleware tenant perché SUPER_ADMIN non ha company_id
+    Route::prefix('company')->name('company.')->middleware(['role:SUPER_ADMIN|COMPANY_ADMIN'])->group(function () {
         Route::get('/invitations', [InvitationController::class, 'index'])->name('invitations.index');
         Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])->name('invitations.show');
         Route::post('/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
