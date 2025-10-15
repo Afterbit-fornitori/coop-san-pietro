@@ -9,7 +9,7 @@
                     <a href="{{ route('weekly-records.index') }}" class="text-indigo-600 hover:text-indigo-900 mr-4">
                         ← Torna alla lista
                     </a>
-                    <h2 class="text-2xl font-semibold">Nuovo Registro Produzione Settimanale</h2>
+                    <h2 class="text-2xl font-semibold">Nuovo Registro Produzione </h2>
                 </div>
 
                 @if($errors->any())

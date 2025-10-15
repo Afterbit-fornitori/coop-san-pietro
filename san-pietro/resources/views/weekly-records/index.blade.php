@@ -78,7 +78,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900"
-                                            onclick="return confirm('Sei sicuro di voler eliminare questo registro?')">
+                                        onclick="return confirm('Sei sicuro di voler eliminare questo registro?')">
                                         Elimina
                                     </button>
                                 </form>
@@ -87,7 +87,7 @@
                         @empty
                         <tr>
                             <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                Nessun registro settimanale trovato. <a href="{{ route('weekly-records.create') }}" class="text-blue-600 hover:text-blue-800">Creane uno nuovo</a>.
+                                Nessun registro trovato. <a href="{{ route('weekly-records.create') }}" class="text-blue-600 hover:text-blue-800">Creane uno nuovo</a>.
                             </td>
                         </tr>
                         @endforelse

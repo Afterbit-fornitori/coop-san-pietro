@@ -4,7 +4,7 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6 text-gray-900 dark:text-gray-100">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold">Registro Settimanale - Settimana {{ $weeklyRecord->week }}/{{ $weeklyRecord->year }}</h2>
+            <h2 class="text-2xl font-semibold">Registro Produzione {{ $weeklyRecord->week }}/{{ $weeklyRecord->year }}</h2>
             <div class="space-x-2">
                 <a href="{{ route('weekly-records.edit', $weeklyRecord) }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     Modifica
